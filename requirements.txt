@@ -1,4 +1,4 @@
-re
+
 requests
 python-vlc
 logging
