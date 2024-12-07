@@ -1,3 +1,12 @@
+print("Initializing IPTVManager...")
+manager = IPTVManager()
+print("IPTVManager initialized.")
+
+print("Loading subscriptions from file...")
+manager.load_subscriptions_from_file('subscriptions.txt')
+print("Subscriptions loaded.")
+
+# Continue adding similar print statements in other key areas...
 print("Script is starting...")
 import sys
 import os
