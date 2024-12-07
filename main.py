@@ -500,12 +500,12 @@ def load_sample_subscriptions(self):
         self.update_listbox()
 
     def update_listbox(self):
-        self.listbox.delete(0, END)
-        for device in self.manager.channels:
-            status = "Actif" if device['active'] else "Inactif"
-            color = "red" if not device['active'] else "black"
-            self.listbox.insert(END, f"MAC: {device['mac']} - URL: {device['url']} - Statut: {status}")
-            self.listbox.itemconfig(self.listbox.size() - 1, {'fg': color})
+    self.listbox.delete(0, END)
+    for device in self.manager.channels:
+        status = "Actif" if device['active'] else "Inactif"
+        color = "red" if not device['active'] else "black"
+        self.listbox.insert(END, f"MAC: {device['mac']} - URL: {device['url']} - Statut: {status}")
+        self.listbox.itemconfig(self.listbox.size() - 1, {'fg': color})
 
     def apply_filter(self, filter_value):
         self.listbox.delete(0, END)
