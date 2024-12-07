@@ -1,3 +1,20 @@
+import sys
+import os
+
+# Afficher un message de démarrage
+print("Démarrage du script...")
+
+# Afficher la version de Python utilisée
+print(f"Version de Python: {sys.version}")
+
+# Afficher le chemin d'exécution du script
+print(f"Chemin du script: {os.path.abspath(__file__)}")
+
+# Afficher le répertoire courant
+print(f"Répertoire courant: {os.getcwd()}")
+
+# Afficher les arguments de la ligne de commande (s'il y en a)
+print(f"Arguments de la ligne de commande: {sys.argv}")
 
 import re
 import requests
