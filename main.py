@@ -1,5 +1,5 @@
 print("Initializing IPTVManager...")
-manager = IPTVManager()
+manager = IPTVManager
 print("IPTVManager initialized.")
 
 print("Loading subscriptions from file...")
