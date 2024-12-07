@@ -468,3 +468,116 @@ class IPTVApp:
             logging.error(f"Erreur lors de la lecture du flux avec VLC: {e}")
             messagebox.showerror("Erreur", "Erreur lors de la tentative de lecture avec VLC.")
    
+def load_sample_subscriptions(self):
+        sample_data = """
+        http://new.ivue.co:25461/c
+        00:1A:79:70:E2:97 April 12, 2025, 4:34 pm
+        00:1A:79:58:11:68 September 29, 2025, 11:00 pm
+        00:1A:79:63:E8:E2 August 20, 2025, 6:37 pm
+        00:1A:79:5C:87:23 January 20, 2025, 5:34 pm
+        00:1A:79:59:C2:C5 February 3, 2025, 8:05 pm
+        00:1A:79:B5:2B:14 February 20, 2025, 10:52 pm
+        00:1A:79:54:88:37 January 28, 2025, 4:57 pm
+        00:1A:79:B8:47:BD March 2, 2025, 7:56 pm
+        00:1A:79:25:BD:13 April 12, 2025, 7:50 pm
+        00:1A:79:CA:62:9A March 5, 2025, 1:53 pm
+        00:1A:79:69:4F:57 February 6, 2025, 4:38 pm
+        00:1A:79:75:33:75 February 23, 2025, 8:19 pm
+        00:1A:79:B8:4D:1E August 17, 2025, 4:54 pm
+        00:1A:79:B8:47:6F February 17, 2025, 5:50 pm
+        00:1A:79:C6:E1:C2 April 28, 2025, 8:53 pm
+        00:1A:79:BB:DD:10 May 3, 2025, 9:54 pm
+        00:1A:79:6A:65:52 April 17, 2025, 1:47 pm
+        00:1A:79:5A:57:43 January 2, 2025, 8:21 pm
+        00:1A:79:7E:DB:16 April 15, 2025, 7:53 pm
+        00:1A:79:2E:8A:C2 April 12, 2025, 2:03 pm
+        00:1A:79:9A:19:78 April 2, 2025, 12:56 pm
+        00:1A:79:5D:E0:FB February 22, 2025, 8:32 pm
+        00:1A:79:42:78:51 March 28, 2025, 6:18 pm
+        00:1A:79:08:80:6F February 17, 2025, 12:05 pm
+        """
+        self.manager.manage_subscriptions(sample_data)
+        self.update_listbox()
+
+    def update_listbox(self):
+        self.listbox.delete(0, END)
+        for device in self.manager.channels:
+            status = "Actif" if device['active'] else "Inactif"
+            color = "red" if not device['active'] else "black"
+            self.listbox.insert(END, f"MAC: {device['mac']} - URL: {device['url']} - Statut: {status}")
+            self.listbox.itemconfig(self.listbox.size() - 1, {'fg': color})
+
+    def apply_filter(self, filter_value):
+        self.listbox.delete(0, END)
+        for device in self.manager.channels:
+            if filter_value == "Tous" or (filter_value == "Actif" and device['active']) or (filter_value == "Inactif" and not device['active']):
+                status = "Actif" if device['active'] else "Inactif"
+                color = "red" if not device['active'] else "black"
+                self.listbox.insert(END, f"MAC: {device['mac']} - URL: {device['url']} - Statut: {status}")
+                self.listbox.itemconfig(self.listbox.size() - 1, {'fg': color})
+
+    def load_subscriptions(self):
+        file_path = "subscriptions.txt"
+        self.manager.load_subscriptions_from_file(file_path)
+        self.update_listbox()
+
+    def change_subscription(self):
+        selected = self.listbox.curselection()
+        if selected:
+            index = selected[0]
+            mac = self.manager.channels[index]['mac']
+            new_url = input("Entrez la nouvelle URL: ")
+            self.manager.switch_subscription(mac, new_url)
+            messagebox.showinfo("Info", f"Changement effectué pour MAC {mac}.")
+        else:
+            messagebox.showwarning("Avertissement", "Veuillez sélectionner un abonnement.")
+
+    def add_to_favorites(self):
+        selected = self.listbox.curselection()
+        if selected:
+            index = selected[0]
+            item = self.listbox.get(index)
+            self.manager.add_to_favorites(item)
+        else:
+            messagebox.showwarning("Avertissement", "Veuillez sélectionner un abonnement.")
+
+    def remove_from_favorites(self):
+        selected = self.listbox.curselection()
+        if selected:
+            index = selected[0]
+            item = self.listbox.get(index)
+            self.manager.remove_from_favorites(item)
+        else:
+            messagebox.showwarning("Avertissement", "Veuillez sélectionner un abonnement.")
+
+    def show_history(self):
+        history = self.manager.view_history()
+        history_str = "\n".join(history) if history else "Aucun historique."
+        messagebox.showinfo("Historique de Visionnage", history_str)
+
+    def search_vod(self):
+        query = self.vod_search_entry.get()
+        results = self.manager.search_vod(query)
+        if results:
+            result_str = "\n".join(results)
+            messagebox.showinfo("Résultats de la recherche", result_str)
+        else:
+            messagebox.showinfo("Résultats de la recherche", "Aucun VOD trouvé.")
+
+    def load_epg_from_server(self):
+        epg_data = []
+        for epg_url in self.manager.epg_urls:
+            epg = self.manager.load_epg(epg_url)
+            if epg:
+                epg_data.append(epg)
+        if epg_data:
+            # Logique pour synchroniser les EPG avec les chaînes
+            logging.info("EPG synchronisé avec succès.")
+            messagebox.showinfo("Info", "EPG synchronisé avec succès.")
+        else:
+            messagebox.showwarning("Avertissement", "Impossible de synchroniser l'EPG.")
+
+if __name__ == "__main__":
+    root = Tk()
+    app = IPTVApp(root)
+    root.mainloop()
