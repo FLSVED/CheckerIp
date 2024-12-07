@@ -484,3 +484,7 @@ class IPTVApp:
                     player_path = self.get_external_player_path(player_choice)
                     if player_path:
                         self.ma
+if __name__ == "__main__":
+    root = Tk()
+    app = IPTVApp(root)
+    root.mainloop()
