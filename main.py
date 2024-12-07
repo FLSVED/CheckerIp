@@ -1,3 +1,4 @@
+print("Script is starting...")
 import sys
 import os
 
