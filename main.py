@@ -1,3 +1,5 @@
+print("Script is starting...")
+# Add the IPTVManager instantiation code here
 print("Initializing IPTVManager...")
 manager = IPTVManager()
 print("IPTVManager initialized.")
@@ -7,11 +9,6 @@ manager.load_subscriptions_from_file('subscriptions.txt')
 print("Subscriptions loaded.")
 
 # Continue adding similar print statements in other key areas...
-print("Script is starting...")
-import sys
-import os
-
-# Afficher un message de démarrage
 print("Démarrage du script...")
 
 # Afficher la version de Python utilisée
@@ -25,7 +22,8 @@ print(f"Répertoire courant: {os.getcwd()}")
 
 # Afficher les arguments de la ligne de commande (s'il y en a)
 print(f"Arguments de la ligne de commande: {sys.argv}")
-
+import sys
+import os
 import re
 import requests
 import vlc
