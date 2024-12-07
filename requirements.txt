@@ -1,0 +1,9 @@
+re
+requests
+python-vlc
+logging
+datetime
+tkinter
+threading
+pytz
+pyperclip
