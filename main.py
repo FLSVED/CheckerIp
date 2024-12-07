@@ -500,7 +500,7 @@ def load_sample_subscriptions(self):
         self.update_listbox()
 
  def update_listbox(self):
-        self.listbox.delete(0, END)
+    self.listbox.delete(0, END)
     for device in self.manager.channels:
         status = "Actif" if device['active'] else "Inactif"
         color = "red" if not device['active'] else "black"
