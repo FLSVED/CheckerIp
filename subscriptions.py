@@ -118,3 +118,4 @@ class SubscriptionManager:
                 device['active'] = False
         else:
             self.connectivity_failures[mac] = 0
+        
