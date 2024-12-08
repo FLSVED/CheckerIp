@@ -1,4 +1,4 @@
-from tkinter import Listbox, Button, Scrollbar, END, messagebox, StringVar, Entry, Label, Frame, Toplevel, ttk, OptionMenu
+from tkinter import Listbox, Button, Scrollbar, END, messagebox, StringVar, Entry, Label, Frame, OptionMenu
 import threading
 import logging
 import pyperclip
@@ -25,7 +25,6 @@ class IPTVApp:
         self.external_player_paths = self.config['external_players']
 
         self.create_main_widgets()
-        self.load_sample_subscriptions()
         threading.Thread(target=self.periodic_connectivity_check, daemon=True).start()
 
     def create_main_widgets(self):
@@ -87,22 +86,15 @@ class IPTVApp:
         return text
 
     async def load_subscriptions(self):
-        file_path = "subscriptions.txt"
-        try:
-            with open(file_path, 'r') as f:
-                data = f.read()
-            report, self.subscriptions = await self.subscription_manager.manage_subscriptions_async(data)
-            self.update_listbox()
-            for line in report:
-                logging.info(line)
-        except FileNotFoundError:
-            logging.error(f"Fichier {file_path} non trouvé.")
-            messagebox.showerror("Erreur", f"Fichier {file_path} non trouvé.")
+        report, _ = await self.subscription_manager.manage_subscriptions_async("")
+        self.update_listbox()
+        for line in report:
+            logging.info(line)
 
     async def load_subscriptions_from_clipboard(self):
         try:
             data = pyperclip.paste()
-            report, self.subscriptions = await self.subscription_manager.manage_subscriptions_async(data)
+            report, _ = await self.subscription_manager.manage_subscriptions_async(data)
             self.update_listbox()
             for line in report:
                 logging.info(line)
@@ -113,7 +105,7 @@ class IPTVApp:
 
     def update_listbox(self):
         self.listbox.delete(0, END)
-        for url, devices in self.subscriptions.items():
+        for url, devices in self.subscription_manager.subscriptions.items():
             for device in devices:
                 status = "Actif" if device['active'] else "Inactif"
                 color = "red" if not device['active'] else "black"
@@ -122,44 +114,7 @@ class IPTVApp:
 
     def periodic_connectivity_check(self):
         while True:
-            time.sleep(28800) # Toutes les 8 heures
             asyncio.run(self.subscription_manager.check_connectivity_async())
             self.update_listbox()
 
     # Additional methods for viewing streams, adding to favorites, etc.
-
-    def view_stream(self):
-        # Implement the logic to view the stream
-        pass
-
-    def add_to_favorites(self):
-        # Implement the logic to add to favorites
-        pass
-
-    def remove_from_favorites(self):
-        # Implement the logic to remove from favorites
-        pass
-
-    def show_history(self):
-        # Implement the logic to show history
-        pass
-
-    def search_vod(self):
-        # Implement the logic to search VOD
-        pass
-
-    def open_settings(self):
-        # Implement the logic to open settings
-        pass
-
-    def open_webpage_input(self):
-        # Implement the logic to open webpage input
-        pass
-
-    def load_epg_from_server(self):
-        # Implement the logic to load EPG from server
-        pass
-
-    def apply_filter(self, filter_option):
-        # Implement the logic to apply filter
-        pass
