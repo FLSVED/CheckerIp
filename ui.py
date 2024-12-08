@@ -116,9 +116,13 @@ class IPTVApp:
                 self.listbox.itemconfig(self.listbox.size() - 1, {'fg': color})
 
     def periodic_connectivity_check(self):
+        asyncio.run(self.run_periodic_check())
+
+    async def run_periodic_check(self):
         while True:
-            asyncio.run(self.subscription_manager.check_connectivity_async())
+            await self.subscription_manager.check_connectivity_async()
             self.update_listbox()
+            await asyncio.sleep(60)  # Check connectivity every 60 seconds
 
     def view_stream(self):
         selected = self.listbox.curselection()
