@@ -5,6 +5,6 @@
         "PotPlayer": "C:/Program Files/DAUM/PotPlayer/PotPlayerMini64.exe"
     },
     "default_language": "fr",
-    "server_url": "http://example.com",  // Replace with actual server URL
-    "mac_address": "00:1A:2B:3C:4D:5E"    // Replace with actual MAC address
+    "server_url": "http://example.com",
+    "mac_address": "00:1A:2B:3C:4D:5E"
 }
