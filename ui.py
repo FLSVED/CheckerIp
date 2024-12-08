@@ -11,10 +11,12 @@ from epg import EpgManager
 __version__ = "1.0.0"
 
 class IPTVApp:
-    def __init__(self, root, config):
+    def __init__(self, root, config, server_url=None, mac_address=None):
         self.root = root
         self.root.title("IPTV Manager")
         self.config = config
+        self.server_url = server_url
+        self.mac_address = mac_address
         
         self.subscription_manager = SubscriptionManager()
         self.stream_manager = StreamManager()
