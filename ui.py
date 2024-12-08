@@ -201,3 +201,9 @@ class IPTVApp:
     def analyze_webpage(self, url):
         # Placeholder for the logic to analyze the webpage
         messagebox.showinfo("Analyser Page Web", f"Analyzing {url}")
+
+    def load_epg_from_server(self):
+        # Implement the logic to load EPG from server
+        epg_data = self.epg_manager.load_epg()
+        # Process the EPG data as needed
+        messagebox.showinfo("EPG", "EPG data loaded from server.")
