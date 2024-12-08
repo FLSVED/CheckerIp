@@ -130,3 +130,21 @@ class SubscriptionManager:
                 device['active'] = False
         else:
             self.connectivity_failures[mac] = 0
+
+    def get_expiration_dates(self):
+        """Retrieve expiration dates of all accounts."""
+        expiration_dates = []
+        for url, devices in self.subscriptions.items():
+            for device in devices:
+                expiration_dates.append({
+                    'mac': device['mac'],
+                    'expiration_date': device['expiration_date']
+                })
+        return expiration_dates
+
+# Example usage
+if __name__ == "__main__":
+    manager = SubscriptionManager()
+    expiration_dates = manager.get_expiration_dates()
+    for account in expiration_dates:
+        print(f"MAC: {account['mac']}, Expiration Date: {account['expiration_date']}")
