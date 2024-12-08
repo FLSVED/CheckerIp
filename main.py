@@ -1,4 +1,4 @@
-```python
+
 import json
 from tkinter import Tk
 from ui import IPTVApp
