@@ -47,8 +47,8 @@ class SubscriptionManager:
 
     def parse_data(self, data):
         url_pattern = r'(http[^\s]+)'
-        mac_pattern = r'(?:(?:MAC\s*)?([0-9A-Fa-f:]+)\s*(?:\s*([\w\s.]+))?)'
-        
+        mac_pattern = r'([0-9A-Fa-f:]+)\s+([\w\s]+, \d{4}, \d{1,2}:\d{2} [ap]m)'
+
         urls = re.findall(url_pattern, data)
         devices = []
 
@@ -57,13 +57,11 @@ class SubscriptionManager:
             expiration_date = None
             if expiration_date_str:
                 try:
-                    expiration_date = datetime.strptime(expiration_date_str.strip(), '%B %d, %Y %I:%M %p')
+                    # Correct format for the given date strings
+                    expiration_date = datetime.strptime(expiration_date_str.strip(), '%B %d, %Y, %I:%M %p')
                 except ValueError:
-                    try:
-                        expiration_date = datetime.strptime(expiration_date_str.strip(), '%m.%d.%Y %I:%M %p')
-                    except ValueError:
-                        logging.warning(f"Date d'expiration non valide pour MAC {mac}: {expiration_date_str}")
-                        expiration_date = None
+                    logging.warning(f"Date d'expiration non valide pour MAC {mac}: {expiration_date_str}")
+                    expiration_date = None
 
             devices.append({
                 'mac': mac,
@@ -130,21 +128,3 @@ class SubscriptionManager:
                 device['active'] = False
         else:
             self.connectivity_failures[mac] = 0
-
-    def get_expiration_dates(self):
-        """Retrieve expiration dates of all accounts."""
-        expiration_dates = []
-        for url, devices in self.subscriptions.items():
-            for device in devices:
-                expiration_dates.append({
-                    'mac': device['mac'],
-                    'expiration_date': device['expiration_date']
-                })
-        return expiration_dates
-
-# Example usage
-if __name__ == "__main__":
-    manager = SubscriptionManager()
-    expiration_dates = manager.get_expiration_dates()
-    for account in expiration_dates:
-        print(f"MAC: {account['mac']}, Expiration Date: {account['expiration_date']}")
