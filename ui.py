@@ -84,7 +84,6 @@ class IPTVApp:
         self.filter_menu.grid(row=12, column=1, padx=5, pady=5)
 
     def translate(self, text):
-        # Placeholder for internationalization logic; replace with actual i18n solution
         return text
 
     async def load_subscriptions(self):
@@ -124,12 +123,9 @@ class IPTVApp:
         if selected:
             index = selected[0]
             entry = self.listbox.get(index)
-            # Extract MAC and URL from the selected entry
             parts = entry.split(" - ")
             mac = parts[0].split(": ")[1]
             url = parts[1].split(": ")[1]
-            # Here you would integrate with the StreamManager to play the stream
-            # Example: self.stream_manager.play_with_vlc(url)
             messagebox.showinfo("Stream Info", f"Playing stream for MAC: {mac} on URL: {url}")
 
     def add_to_favorites(self):
@@ -155,7 +151,6 @@ class IPTVApp:
                 messagebox.showinfo("Favoris", f"{entry} n'est pas dans les favoris.")
 
     def show_history(self):
-        # Implement the logic to show history
         messagebox.showinfo("Historique", "Historique affiché.")
 
     def search_vod(self):
@@ -163,8 +158,6 @@ class IPTVApp:
         if not search_query:
             messagebox.showwarning("Attention", "Veuillez entrer un terme de recherche.")
             return
-
-        # Assuming VodManager has a search method
         results = self.vod_manager.search(search_query)
         if results:
             self.show_vod_results(results)
@@ -172,25 +165,19 @@ class IPTVApp:
             messagebox.showinfo("Résultats de recherche", "Aucun VOD trouvé.")
 
     def show_vod_results(self, results):
-        # Implement a method to display the VOD search results
         result_window = Toplevel(self.root)
         result_window.title("Résultats de recherche VOD")
-        
         listbox = Listbox(result_window, width=50)
         listbox.pack(padx=10, pady=10)
-
         for result in results:
             listbox.insert(END, result)
 
     def open_settings(self):
-        # Implement the logic to open settings
         settings_window = Toplevel(self.root)
         settings_window.title("Réglages")
-        # Add widgets to the settings window as needed
         Label(settings_window, text="Réglages").pack(padx=10, pady=10)
 
     def open_webpage_input(self):
-        # Implement the logic to open webpage input
         webpage_window = Toplevel(self.root)
         webpage_window.title("Analyser Page Web")
         Label(webpage_window, text="URL:").pack(padx=10, pady=10)
@@ -199,11 +186,12 @@ class IPTVApp:
         Button(webpage_window, text="Analyser", command=lambda: self.analyze_webpage(url_entry.get())).pack(padx=10, pady=10)
 
     def analyze_webpage(self, url):
-        # Placeholder for the logic to analyze the webpage
         messagebox.showinfo("Analyser Page Web", f"Analyzing {url}")
 
     def load_epg_from_server(self):
-        # Implement the logic to load EPG from server
         epg_data = self.epg_manager.load_epg()
-        # Process the EPG data as needed
         messagebox.showinfo("EPG", "EPG data loaded from server.")
+
+    def apply_filter(self, selected_filter):
+        # Implement the filtering logic here
+        messagebox.showinfo("Filtre", f"Filtrage appliqué: {selected_filter}")
