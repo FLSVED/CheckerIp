@@ -1,4 +1,3 @@
-python
 from tkinter import Listbox, Button, Scrollbar, END, messagebox, StringVar, Entry, Label, Frame, Toplevel, ttk, OptionMenu
 import threading
 import logging
