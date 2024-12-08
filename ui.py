@@ -181,3 +181,10 @@ class IPTVApp:
 
         for result in results:
             listbox.insert(END, result)
+
+    def open_settings(self):
+        # Implement the logic to open settings
+        settings_window = Toplevel(self.root)
+        settings_window.title("Réglages")
+        # Add widgets to the settings window as needed
+        Label(settings_window, text="Réglages").pack(padx=10, pady=10)
