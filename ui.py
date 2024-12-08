@@ -127,3 +127,39 @@ class IPTVApp:
             self.update_listbox()
 
     # Additional methods for viewing streams, adding to favorites, etc.
+
+    def view_stream(self):
+        # Implement the logic to view the stream
+        pass
+
+    def add_to_favorites(self):
+        # Implement the logic to add to favorites
+        pass
+
+    def remove_from_favorites(self):
+        # Implement the logic to remove from favorites
+        pass
+
+    def show_history(self):
+        # Implement the logic to show history
+        pass
+
+    def search_vod(self):
+        # Implement the logic to search VOD
+        pass
+
+    def open_settings(self):
+        # Implement the logic to open settings
+        pass
+
+    def open_webpage_input(self):
+        # Implement the logic to open webpage input
+        pass
+
+    def load_epg_from_server(self):
+        # Implement the logic to load EPG from server
+        pass
+
+    def apply_filter(self, filter_option):
+        # Implement the logic to apply filter
+        pass
