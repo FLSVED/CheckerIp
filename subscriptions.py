@@ -68,7 +68,8 @@ class SubscriptionManager:
         for attempt in range(retries):
             try:
                 async with aiohttp.ClientSession() as session:
-                    async with session.get(url, timeout=10, headers=headers) as response:
+                    async with session.get(url, timeout=20, headers=headers) as response:  # Increased timeout
+                        logging.info(f"Response status: {response.status}, URL: {url}, MAC: {mac}")
                         if response.status == 200:
                             return True
             except aiohttp.ClientError as e:
@@ -118,4 +119,3 @@ class SubscriptionManager:
                 device['active'] = False
         else:
             self.connectivity_failures[mac] = 0
-        
