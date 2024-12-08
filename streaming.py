@@ -1,4 +1,3 @@
-python
 import vlc
 import logging
 from tkinter import messagebox
