@@ -117,4 +117,14 @@ class IPTVApp:
             asyncio.run(self.subscription_manager.check_connectivity_async())
             self.update_listbox()
 
-    # Additional methods for viewing streams, adding to favorites, etc.
+    # Method to view stream
+    def view_stream(self):
+        selected_item = self.listbox.curselection()
+        if selected_item:
+            selected_text = self.listbox.get(selected_item)
+            mac = selected_text.split('-')[0].strip().split(':')[1].strip()
+            stream_url = self.subscription_manager.get_stream_url(mac)
+            self.stream_manager.play_with_vlc(stream_url)
+        else:
+            messagebox.showwarning("Avertissement", "Veuillez sélectionner un abonnement à visionner.")
+        
