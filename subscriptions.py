@@ -60,19 +60,21 @@ class SubscriptionManager:
 
         return urls, devices
 
-    async def validate_connection_async(self, url, mac):
+    async def validate_connection_async(self, url, mac, retries=3):
         headers = {
             "User-Agent": "Mozilla/5.0",
             "X-MAC-Address": mac
         }
-        
-        async with aiohttp.ClientSession() as session:
+        for attempt in range(retries):
             try:
-                async with session.get(url, timeout=5, headers=headers) as response:
-                    return response.status == 200
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url, timeout=10, headers=headers) as response:
+                        if response.status == 200:
+                            return True
             except aiohttp.ClientError as e:
                 logging.error(f"Erreur de connexion à {url} avec MAC {mac}: {e}")
-                return False
+            await asyncio.sleep(2)  # Wait before retrying
+        return False
 
     async def manage_subscriptions_async(self, data):
         urls, devices = self.parse_data(data)
