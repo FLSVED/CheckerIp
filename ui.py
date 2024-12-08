@@ -130,4 +130,31 @@ class IPTVApp:
             # Example: self.stream_manager.play_with_vlc(url)
             messagebox.showinfo("Stream Info", f"Playing stream for MAC: {mac} on URL: {url}")
 
-    # Add any additional methods as needed
+    def add_to_favorites(self):
+        selected = self.listbox.curselection()
+        if selected:
+            index = selected[0]
+            entry = self.listbox.get(index)
+            # Add the selected entry to favorites (implement your favorite logic here)
+            # Example: self.favorites.append(entry)
+            messagebox.showinfo("Favoris", f"Ajouté aux favoris: {entry}")
+
+    def remove_from_favorites(self):
+        # Implement the logic to remove from favorites
+        pass
+
+    def show_history(self):
+        # Implement the logic to show history
+        pass
+
+    def search_vod(self):
+        # Implement the logic to search VOD
+        pass
+
+    def open_settings(self):
+        # Implement the logic to open settings
+        pass
+
+    def apply_filter(self, filter_value):
+        # Implement the logic to apply filter
+        pass
