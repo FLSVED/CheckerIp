@@ -6,3 +6,5 @@ tkinter
 threading
 pytz
 pyperclip
+vlc
+aiohttp
