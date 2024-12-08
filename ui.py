@@ -188,3 +188,16 @@ class IPTVApp:
         settings_window.title("Réglages")
         # Add widgets to the settings window as needed
         Label(settings_window, text="Réglages").pack(padx=10, pady=10)
+
+    def open_webpage_input(self):
+        # Implement the logic to open webpage input
+        webpage_window = Toplevel(self.root)
+        webpage_window.title("Analyser Page Web")
+        Label(webpage_window, text="URL:").pack(padx=10, pady=10)
+        url_entry = Entry(webpage_window, width=50)
+        url_entry.pack(padx=10, pady=10)
+        Button(webpage_window, text="Analyser", command=lambda: self.analyze_webpage(url_entry.get())).pack(padx=10, pady=10)
+
+    def analyze_webpage(self, url):
+        # Placeholder for the logic to analyze the webpage
+        messagebox.showinfo("Analyser Page Web", f"Analyzing {url}")
