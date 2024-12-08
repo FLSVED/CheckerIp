@@ -24,7 +24,7 @@ class IPTVApp:
         self.player_choice = StringVar(value="VLC")
         self.external_player_paths = self.config['external_players']
 
-        self.favorites = [] # Add a list to store favorites
+        self.favorites = []  # Add a list to store favorites
 
         self.create_main_widgets()
         threading.Thread(target=self.periodic_connectivity_check, daemon=True).start()
@@ -153,3 +153,7 @@ class IPTVApp:
                 messagebox.showinfo("Favoris", f"{entry} a été retiré des favoris.")
             else:
                 messagebox.showinfo("Favoris", f"{entry} n'est pas dans les favoris.")
+
+    def show_history(self):
+        # Implement the logic to show history
+        messagebox.showinfo("Historique", "Historique affiché.")
