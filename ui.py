@@ -24,6 +24,8 @@ class IPTVApp:
         self.player_choice = StringVar(value="VLC")
         self.external_player_paths = self.config['external_players']
 
+        self.favorites = [] # Add a list to store favorites
+
         self.create_main_widgets()
         threading.Thread(target=self.periodic_connectivity_check, daemon=True).start()
 
@@ -135,26 +137,19 @@ class IPTVApp:
         if selected:
             index = selected[0]
             entry = self.listbox.get(index)
-            # Add the selected entry to favorites (implement your favorite logic here)
-            # Example: self.favorites.append(entry)
-            messagebox.showinfo("Favoris", f"Ajouté aux favoris: {entry}")
+            if entry not in self.favorites:
+                self.favorites.append(entry)
+                messagebox.showinfo("Favoris", f"{entry} a été ajouté aux favoris.")
+            else:
+                messagebox.showinfo("Favoris", f"{entry} est déjà dans les favoris.")
 
     def remove_from_favorites(self):
-        # Implement the logic to remove from favorites
-        pass
-
-    def show_history(self):
-        # Implement the logic to show history
-        pass
-
-    def search_vod(self):
-        # Implement the logic to search VOD
-        pass
-
-    def open_settings(self):
-        # Implement the logic to open settings
-        pass
-
-    def apply_filter(self, filter_value):
-        # Implement the logic to apply filter
-        pass
+        selected = self.listbox.curselection()
+        if selected:
+            index = selected[0]
+            entry = self.listbox.get(index)
+            if entry in self.favorites:
+                self.favorites.remove(entry)
+                messagebox.showinfo("Favoris", f"{entry} a été retiré des favoris.")
+            else:
+                messagebox.showinfo("Favoris", f"{entry} n'est pas dans les favoris.")
