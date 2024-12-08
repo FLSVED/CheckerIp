@@ -1,4 +1,4 @@
-from tkinter import Listbox, Button, Scrollbar, END, messagebox, StringVar, Entry, Label, Frame, OptionMenu
+from tkinter import Listbox, Button, Scrollbar, END, messagebox, StringVar, Entry, Label, Frame, OptionMenu, Toplevel
 import threading
 import logging
 import pyperclip
@@ -157,3 +157,27 @@ class IPTVApp:
     def show_history(self):
         # Implement the logic to show history
         messagebox.showinfo("Historique", "Historique affiché.")
+
+    def search_vod(self):
+        search_query = self.vod_search_entry.get()
+        if not search_query:
+            messagebox.showwarning("Attention", "Veuillez entrer un terme de recherche.")
+            return
+
+        # Assuming VodManager has a search method
+        results = self.vod_manager.search(search_query)
+        if results:
+            self.show_vod_results(results)
+        else:
+            messagebox.showinfo("Résultats de recherche", "Aucun VOD trouvé.")
+
+    def show_vod_results(self, results):
+        # Implement a method to display the VOD search results
+        result_window = Toplevel(self.root)
+        result_window.title("Résultats de recherche VOD")
+        
+        listbox = Listbox(result_window, width=50)
+        listbox.pack(padx=10, pady=10)
+
+        for result in results:
+            listbox.insert(END, result)
