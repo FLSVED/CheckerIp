@@ -1,53 +1,26 @@
-import requests
-from datetime import datetime
+import aiohttp
+import logging
 
 class ServerConnection:
-    def __init__(self, server_url, mac_address, expiry_date):
+    def __init__(self, server_url, mac_address):
         self.server_url = server_url
         self.mac_address = mac_address
-        self.expiry_date = expiry_date
 
-    def is_valid_mac(self):
-        """Vérifie si l'adresse MAC est valide."""
-        if len(self.mac_address) == 17 and all(c in "0123456789ABCDEFabcdef:-" for c in self.mac_address.replace(':', '').replace('-', '')):
-            return True
-        return False
-
-    def is_url_expired(self):
-        """Vérifie si l'URL du portail est expirée."""
-        current_date = datetime.now()
-        expiry_date = datetime.strptime(self.expiry_date, "%B %d, %Y")
-        return current_date > expiry_date
-
-    def connect(self):
+    async def connect(self):
         """
-        Se connecte à un serveur HTTP IPTV avec un portail MAC.
+        Essaie de se connecter au serveur IPTV de manière asynchrone.
 
-        :return: Réponse du serveur ou None si échec
+        :return: True si la connexion est réussie, False sinon
         """
+        headers = {
+            'User-Agent': 'Mozilla/5.0',
+            'X-MAC-Address': self.mac_address
+        }
         try:
-            if not self.is_valid_mac():
-                print("Adresse MAC invalide.")
-                return None
-            
-            if self.is_url_expired():
-                print("L'URL du portail est expirée.")
-                return None
-            
-            headers = {
-                'User-Agent': 'Mozilla/5.0',
-                'MAC': self.mac_address
-            }
-            
-            response = requests.get(self.server_url, headers=headers)
-            
-            if response.status_code == 200:
-                print("Connexion établie avec succès!")
-                return response.text
-            else:
-                print(f"Échec de la connexion: {response.status_code}")
-                return None
-
-        except requests.exceptions.RequestException as e:
-            print(f"Erreur de requête: {e}")
-            return None
+            async with aiohttp.ClientSession() as session:
+                async with session.get(self.server_url, headers=headers, timeout=20) as response:
+                    logging.info(f"Response status: {response.status} for MAC {self.mac_address} at {self.server_url}")
+                    return response.status == 200
+        except aiohttp.ClientError as e:
+            logging.error(f"Erreur de connexion pour MAC {self.mac_address} à {self.server_url}: {e}")
+            return False
