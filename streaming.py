@@ -1,47 +1,43 @@
 import vlc
 import logging
+import time
 from tkinter import messagebox
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 class StreamManager:
     def __init__(self):
-        pass
+        self.instance = vlc.Instance()
+        self.player = self.instance.media_player_new()
 
     def test_stream(self, stream_url, mac):
         try:
-            instance = vlc.Instance()
-            player = instance.media_player_new()
-            media = instance.media_new(stream_url)
-            player.set_media(media)
-
-            player.play()
-            time.sleep(2) # Réduit à 2 secondes pour une vérification rapide
-            state = player.get_state()
-            player.stop()
-
+            media = self.instance.media_new(stream_url)
+            self.player.set_media(media)
+            self.player.play()
+            time.sleep(2)  # Reduced to 2 seconds for a quick check
+            state = self.player.get_state()
+            self.player.stop()
             return state == vlc.State.Playing
         except Exception as e:
-            logging.error(f"Erreur lors du test du flux {stream_url} avec MAC {mac}: {e}")
+            logging.error(f"Error testing stream {stream_url} with MAC {mac}: {e}")
             return False
 
     def play_with_vlc(self, stream_url):
         try:
-            instance = vlc.Instance()
-            player = instance.media_player_new()
-            media = instance.media_new(stream_url)
-            player.set_media(media)
-            player.play()
+            media = self.instance.media_new(stream_url)
+            self.player.set_media(media)
+            self.player.play()
 
-            # Attendre que le flux commence à jouer
+            # Wait for the stream to start playing
             while True:
-                state = player.get_state()
+                state = self.player.get_state()
                 if state == vlc.State.Playing:
-                    messagebox.showinfo("Info", "Lecture du flux en cours...")
+                    messagebox.showinfo("Info", "Stream is playing...")
                     break
                 elif state in [vlc.State.Error, vlc.State.Ended]:
-                    messagebox.showwarning("Avertissement", "Impossible de lire le flux.")
+                    messagebox.showwarning("Warning", "Unable to play the stream.")
                     break
         except Exception as e:
-            logging.error(f"Erreur lors de la lecture du flux avec VLC: {e}")
-            messagebox.showerror("Erreur", "Erreur lors de la tentative de lecture avec VLC.")
+            logging.error(f"Error playing stream with VLC: {e}")
+            messagebox.showerror("Error", "Error attempting to play with VLC.")
