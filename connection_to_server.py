@@ -21,7 +21,7 @@ class ServerConnection:
                 async with session.get(self.server_url, headers=self.headers, timeout=20) as response:
                     logging.info(f"Response status: {response.status} for MAC {self.mac_address} at {self.server_url}")
                     return response.status == 200
-        except aiohttp.ClientTimeoutError:
+        except aiohttp.ClientTimeout:
             logging.error(f"Timeout error for MAC {self.mac_address} at {self.server_url}")
         except aiohttp.ClientConnectionError:
             logging.error(f"Connection error for MAC {self.mac_address} at {self.server_url}")
