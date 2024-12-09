@@ -1,25 +1,43 @@
-import json
-from tkinter import Tk, messagebox
-from ui import IPTVApp
-from config import load_config, get_server_url, get_mac_address, load_additional_sources
+import vlc
+import logging
+import time
+from tkinter import messagebox
 
-def main():
-    config = load_config()
-    server_url = get_server_url(config)
-    mac_address = get_mac_address(config)
-    
-    if not server_url or not mac_address:
+__version__ = "1.1.0"
+
+class StreamManager:
+    def __init__(self):
+        self.instance = vlc.Instance()
+        self.player = self.instance.media_player_new()
+
+    def test_stream(self, stream_url, mac):
         try:
-            server_url, mac_address = load_additional_sources()
+            media = self.instance.media_new(stream_url)
+            self.player.set_media(media)
+            self.player.play()
+            time.sleep(2)  # Reduced to 2 seconds for a quick check
+            state = self.player.get_state()
+            self.player.stop()
+            return state == vlc.State.Playing
         except Exception as e:
-            print(f"Error loading additional sources: {e}")
+            logging.error(f"Error testing stream {stream_url} with MAC {mac}: {e}")
+            return False
 
-    if not server_url or not mac_address:
-        messagebox.showwarning("Warning", "Server URL or MAC address is missing. Please configure them manually later.")
+    def play_with_vlc(self, stream_url):
+        try:
+            media = self.instance.media_new(stream_url)
+            self.player.set_media(media)
+            self.player.play()
 
-    root = Tk()
-    app = IPTVApp(root, config, server_url, mac_address)
-    root.mainloop()
-
-if __name__ == "__main__":
-    main()
+            # Wait for the stream to start playing
+            while True:
+                state = self.player.get_state()
+                if state == vlc.State.Playing:
+                    messagebox.showinfo("Info", "Stream is playing...")
+                    break
+                elif state in [vlc.State.Error, vlc.State.Ended]:
+                    messagebox.showwarning("Warning", "Unable to play the stream.")
+                    break
+        except Exception as e:
+            logging.error(f"Error playing stream with VLC: {e}")
+            messagebox.showerror("Error", "Error attempting to play with VLC.")
