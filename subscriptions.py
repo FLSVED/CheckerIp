@@ -1,5 +1,6 @@
 import re
 import logging
+import asyncio
 from connection_to_server import ServerConnection
 
 __version__ = "1.1.0"
@@ -43,7 +44,7 @@ class SubscriptionManager:
         urls, devices = self.parse_data(DEFAULT_SUBSCRIPTIONS)
         for url in urls:
             for device in devices:
-                self.add_subscription(url, device['mac'])
+                asyncio.run(self.add_subscription_async(url, device['mac']))
 
     def parse_data(self, data):
         url_pattern = r'(http[^\s]+)'
@@ -58,7 +59,7 @@ class SubscriptionManager:
 
         return urls, devices
 
-    def add_subscription(self, server_url, mac_address):
+    async def add_subscription_async(self, server_url, mac_address):
         """
         Ajoute un abonnement après validation de la connexion au serveur.
 
@@ -66,20 +67,18 @@ class SubscriptionManager:
         :param mac_address: Adresse MAC à utiliser
         :return: Vrai si l'abonnement est ajouté, faux sinon
         """
-        connection = ServerConnection(server_url, mac_address, "December 31, 2024")  # Utilisation d'une date d'expiration fictive
-        response = connection.connect()
-        if response:
+        connection = ServerConnection(server_url, mac_address)
+        if await connection.connect():
             if server_url not in self.subscriptions:
                 self.subscriptions[server_url] = []
             self.subscriptions[server_url].append({
                 'mac': mac_address,
-                'data': response,
                 'active': True
             })
             return True
         return False
 
-    def manage_subscriptions(self, data):
+    async def manage_subscriptions_async(self, data):
         """
         Gère les abonnements en validant et ajoutant ceux qui sont connectables.
 
@@ -87,42 +86,42 @@ class SubscriptionManager:
         :return: Rapport et abonnements valides
         """
         urls, devices = self.parse_data(data)
-        report, valid_devices = [], []
+        report = []
         
         for url in urls:
             for device in devices:
-                if self.add_subscription(url, device['mac']):
+                if await self.add_subscription_async(url, device['mac']):
                     report.append(f"Connexion au serveur {url} réussie avec MAC {device['mac']}.")
-                    valid_devices.append(device)
                 else:
                     report.append(f"Échec de la connexion au serveur {url} avec MAC {device['mac']}.")
                     
         return report, self.subscriptions
 
-    def check_connectivity(self):
+    async def check_connectivity_async(self):
         """
         Vérifie la connectivité de tous les abonnements et met à jour leur statut.
         """
+        tasks = []
         for url, devices in self.subscriptions.items():
             for device in devices:
-                connection = ServerConnection(url, device['mac'], "December 31, 2024")
-                response = connection.connect()
-                if response:
-                    device['active'] = True
-                    device['data'] = response
-                else:
-                    device['active'] = False
-                    self.connectivity_failures[device['mac']] = self.connectivity_failures.get(device['mac'], 0) + 1
+                tasks.append(self._check_device_connectivity_async(url, device))
+        await asyncio.gather(*tasks)
+
+    async def _check_device_connectivity_async(self, url, device):
+        connection = ServerConnection(url, device['mac'])
+        if not await connection.connect():
+            self.connectivity_failures[device['mac']] = self.connectivity_failures.get(device['mac'], 0) + 1
+            if self.connectivity_failures[device['mac']] >= 3:
+                logging.warning(f"L'abonnement avec MAC {device['mac']} a été désactivé après 3 échecs de connexion.")
+                device['active'] = False
+        else:
+            self.connectivity_failures[device['mac']] = 0
 
 # Exemple d'utilisation
 if __name__ == "__main__":
     manager = SubscriptionManager()
-    report, subscriptions = manager.manage_subscriptions(DEFAULT_SUBSCRIPTIONS)
-    for line in report:
-        logging.info(line)
-    
-    # Vérification de la connectivité
-    manager.check_connectivity()
+    asyncio.run(manager.manage_subscriptions_async(DEFAULT_SUBSCRIPTIONS))
+    asyncio.run(manager.check_connectivity_async())
     for url, devices in manager.subscriptions.items():
         for device in devices:
             status = "actif" if device['active'] else "inactif"
