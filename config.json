@@ -1,10 +1,8 @@
-{
-    "version": "1.0.0",
-    "external_players": {
-        "MPV": "C:/Program Files/mpv/mpv.exe",
-        "PotPlayer": "C:/Program Files/DAUM/PotPlayer/PotPlayerMini64.exe"
-    },
-    "default_language": "fr",
-    "server_url": "http://example.com",
-    "mac_address": "00:1A:2B:3C:4D:5E"
-}
+ {
+       "version": "1.0.0",
+       "external_players": {
+           "MPV": "C:/Program Files/mpv/mpv.exe",
+           "PotPlayer": "C:/Program Files/DAUM/PotPlayer/PotPlayerMini64.exe"
+       },
+       "default_language": "fr"
+   }
