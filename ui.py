@@ -4,7 +4,6 @@ import logging
 import pyperclip
 import asyncio
 from subscriptions import SubscriptionManager
-from streaming import StreamManager
 from vod import VodManager
 from epg import EpgManager
 
@@ -19,7 +18,6 @@ class IPTVApp:
         self.mac_address = mac_address
         
         self.subscription_manager = SubscriptionManager()
-        self.stream_manager = StreamManager()
         self.vod_manager = VodManager()
         self.epg_manager = EpgManager()
 
@@ -132,6 +130,10 @@ class IPTVApp:
             parts = entry.split(" - ")
             mac = parts[0].split(": ")[1]
             url = parts[1].split(": ")[1]
+            # Dynamically import StreamManager to avoid circular import
+            from streaming import StreamManager
+            stream_manager = StreamManager()
+            stream_manager.play_with_vlc(url)
             messagebox.showinfo("Stream Info", f"Playing stream for MAC: {mac} on URL: {url}")
 
     def add_to_favorites(self):
