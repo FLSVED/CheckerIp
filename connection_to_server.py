@@ -29,6 +29,8 @@ class ServerConnection:
             logging.error(f"Response error for MAC {self.mac_address} at {self.server_url}: {e}")
         except aiohttp.ClientError as e:
             logging.error(f"Client error for MAC {self.mac_address} at {self.server_url}: {e}")
+        except Exception as e:
+            logging.error(f"Unexpected error for MAC {self.mac_address} at {self.server_url}: {e}")
         return False
 
     def update_headers(self, new_headers):
