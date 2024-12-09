@@ -51,7 +51,7 @@ class IPTVApp:
         self.favorite_button = Button(frame, text=self.translate("Ajouter aux Favoris"), command=self.add_to_favorites)
         self.favorite_button.grid(row=3, column=2, padx=5, pady=5)
 
-        self.remove_favorite_button = Button(frame, text=self.translate("Supprimer des Favoris"), command=self.remove_from_favorites)
+        self.remove_favorite_button = Button(frame, text=self.translate("Supprimer des Favoris"), command(self.remove_from_favorites))
         self.remove_favorite_button.grid(row=4, column=2, padx=5, pady=5)
 
         self.history_button = Button(frame, text=self.translate("Afficher Historique"), command=self.show_history)
@@ -74,7 +74,7 @@ class IPTVApp:
         self.webpage_button = Button(frame, text=self.translate("Analyser Page Web"), command=self.open_webpage_input)
         self.webpage_button.grid(row=10, column=2, padx=5, pady=5)
 
-        self.load_epg_button = Button(frame, text=self.translate("Charger EPG"), command=self.load_epg_from_server)
+        self.load_epg_button = Button(frame, text(self.translate("Charger EPG")), command=self.load_epg_from_server)
         self.load_epg_button.grid(row=11, column=2, padx=5, pady=5)
 
         # Options de filtre et de tri
