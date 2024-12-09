@@ -1,7 +1,7 @@
 import re
 import logging
 import asyncio
-from connection_to_server import ServerConnection
+from connection_to_server import ServerConnection  # Assurez-vous que le chemin est correct
 
 __version__ = "1.1.0"
 
