@@ -1,8 +1,8 @@
- {
-       "version": "1.0.0",
-       "external_players": {
-           "MPV": "C:/Program Files/mpv/mpv.exe",
-           "PotPlayer": "C:/Program Files/DAUM/PotPlayer/PotPlayerMini64.exe"
-       },
-       "default_language": "fr"
-   }
+{
+    "version": "1.0.0",
+    "external_players": {
+        "MPV": "C:/Program Files/mpv/mpv.exe",
+        "PotPlayer": "C:/Program Files/DAUM/PotPlayer/PotPlayerMini64.exe"
+    },
+    "default_language": "fr"
+}
