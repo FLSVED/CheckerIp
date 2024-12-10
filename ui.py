@@ -1,4 +1,5 @@
-from tkinter import Listbox, Button, Scrollbar, END, messagebox, StringVar, Entry, Label, Frame, OptionMenu, Toplevel
+from tkinter import Listbox, Button, Scrollbar, END, messagebox, StringVar, Entry, Label, Frame, OptionMenu, Toplevel, Canvas
+from tkinter import ttk
 import threading
 import logging
 import pyperclip
@@ -6,6 +7,7 @@ import asyncio
 from subscriptions import SubscriptionManager
 from vod import VodManager
 from epg import EpgManager
+import vlc
 
 __version__ = "2.0.0"
 
@@ -30,10 +32,13 @@ class IPTVApp:
         threading.Thread(target=self.periodic_connectivity_check, daemon=True).start()
 
     def create_main_widgets(self):
-        frame = Frame(self.root)
+        style = ttk.Style()
+        style.theme_use('clam')
+
+        frame = ttk.Frame(self.root)
         frame.pack(fill='both', expand=True)
 
-        Label(frame, text=self.translate("Liste des Abonnements")).grid(row=0, column=0, padx=5, pady=5)
+        ttk.Label(frame, text=self.translate("Liste des Abonnements")).grid(row=0, column=0, padx=5, pady=5)
 
         self.listbox = Listbox(frame, width=50)
         self.listbox.grid(row=1, column=0, rowspan=6, padx=5, pady=5)
@@ -42,51 +47,54 @@ class IPTVApp:
         scrollbar.grid(row=1, column=1, rowspan=6, sticky='ns')
         self.listbox.config(yscrollcommand=scrollbar.set)
 
-        self.load_button = Button(frame, text=self.translate("Charger Abonnements"), command=lambda: asyncio.run(self.load_subscriptions()))
+        self.load_button = ttk.Button(frame, text=self.translate("Charger Abonnements"), command=lambda: asyncio.run(self.load_subscriptions()))
         self.load_button.grid(row=1, column=2, padx=5, pady=5)
 
-        self.view_button = Button(frame, text=self.translate("Visionner Flux"), command=self.view_stream)
+        self.view_button = ttk.Button(frame, text=self.translate("Visionner Flux"), command=self.view_stream)
         self.view_button.grid(row=2, column=2, padx=5, pady=5)
 
-        self.favorite_button = Button(frame, text=self.translate("Ajouter aux Favoris"), command=self.add_to_favorites)
+        self.favorite_button = ttk.Button(frame, text=self.translate("Ajouter aux Favoris"), command=self.add_to_favorites)
         self.favorite_button.grid(row=3, column=2, padx=5, pady=5)
 
-        self.remove_favorite_button = Button(frame, text=self.translate("Supprimer des Favoris"), command=self.remove_from_favorites)
+        self.remove_favorite_button = ttk.Button(frame, text=self.translate("Supprimer des Favoris"), command=self.remove_from_favorites)
         self.remove_favorite_button.grid(row=4, column=2, padx=5, pady=5)
 
-        self.history_button = Button(frame, text=self.translate("Afficher Historique"), command=self.show_history)
+        self.history_button = ttk.Button(frame, text=self.translate("Afficher Historique"), command=self.show_history)
         self.history_button.grid(row=5, column=2, padx=5, pady=5)
 
-        Label(frame, text=self.translate("Recherche VOD")).grid(row=6, column=0, padx=5, pady=5)
+        ttk.Label(frame, text=self.translate("Recherche VOD")).grid(row=6, column=0, padx=5, pady=5)
 
-        self.vod_search_entry = Entry(frame)
+        self.vod_search_entry = ttk.Entry(frame)
         self.vod_search_entry.grid(row=7, column=0, padx=5, pady=5)
 
-        self.search_button = Button(frame, text=self.translate("Rechercher VOD"), command=self.search_vod)
+        self.search_button = ttk.Button(frame, text=self.translate("Rechercher VOD"), command=self.search_vod)
         self.search_button.grid(row=7, column=2, padx=5, pady=5)
 
-        self.settings_button = Button(frame, text=self.translate("Réglages"), command=self.open_settings)
+        self.settings_button = ttk.Button(frame, text=self.translate("Réglages"), command=self.open_settings)
         self.settings_button.grid(row=8, column=2, padx=5, pady=5)
 
-        self.clipboard_button = Button(frame, text=self.translate("Charger depuis Presse-papier"), command=lambda: asyncio.run(self.load_subscriptions_from_clipboard()))
+        self.clipboard_button = ttk.Button(frame, text=self.translate("Charger depuis Presse-papier"), command=lambda: asyncio.run(self.load_subscriptions_from_clipboard()))
         self.clipboard_button.grid(row=9, column=2, padx=5, pady=5)
 
-        self.webpage_button = Button(frame, text=self.translate("Analyser Page Web"), command=self.open_webpage_input)
+        self.webpage_button = ttk.Button(frame, text=self.translate("Analyser Page Web"), command=self.open_webpage_input)
         self.webpage_button.grid(row=10, column=2, padx=5, pady=5)
 
-        self.load_epg_button = Button(frame, text=self.translate("Charger EPG"), command=self.load_epg_from_server)
+        self.load_epg_button = ttk.Button(frame, text=self.translate("Charger EPG"), command=self.load_epg_from_server)
         self.load_epg_button.grid(row=11, column=2, padx=5, pady=5)
 
-        self.paste_text_button = Button(frame, text=self.translate("Coller Texte"), command=self.open_text_input)
+        self.paste_text_button = ttk.Button(frame, text=self.translate("Coller Texte"), command=self.open_text_input)
         self.paste_text_button.grid(row=12, column=2, padx=5, pady=5)
 
-        self.m3u_button = Button(frame, text=self.translate("Charger M3U"), command=self.open_m3u_input)
+        self.m3u_button = ttk.Button(frame, text=self.translate("Charger M3U"), command=self.open_m3u_input)
         self.m3u_button.grid(row=13, column=2, padx=5, pady=5)
 
         self.filter_var = StringVar(value="Tous")
-        Label(frame, text=self.translate("Filtrer par statut:")).grid(row=14, column=0, padx=5, pady=5)
-        self.filter_menu = OptionMenu(frame, self.filter_var, "Tous", "Actif", "Inactif", command=self.apply_filter)
+        ttk.Label(frame, text=self.translate("Filtrer par statut:")).grid(row=14, column=0, padx=5, pady=5)
+        self.filter_menu = ttk.OptionMenu(frame, self.filter_var, "Tous", "Actif", "Inactif", command=self.apply_filter)
         self.filter_menu.grid(row=14, column=1, padx=5, pady=5)
+
+        self.video_canvas = Canvas(frame, width=640, height=360)
+        self.video_canvas.grid(row=15, column=0, columnspan=3, padx=5, pady=5)
 
     def translate(self, text):
         return text
@@ -128,18 +136,18 @@ class IPTVApp:
     def open_text_input(self):
         text_window = Toplevel(self.root)
         text_window.title("Coller Texte")
-        Label(text_window, text="Texte:").pack(padx=10, pady=10)
-        text_entry = Entry(text_window, width=50)
+        ttk.Label(text_window, text="Texte:").pack(padx=10, pady=10)
+        text_entry = ttk.Entry(text_window, width=50)
         text_entry.pack(padx=10, pady=10)
-        Button(text_window, text="Charger", command=lambda: asyncio.run(self.load_subscriptions_from_text(text_entry.get()))).pack(padx=10, pady=10)
+        ttk.Button(text_window, text="Charger", command=lambda: asyncio.run(self.load_subscriptions_from_text(text_entry.get()))).pack(padx=10, pady=10)
 
     def open_m3u_input(self):
         m3u_window = Toplevel(self.root)
         m3u_window.title("Charger M3U")
-        Label(m3u_window, text="URL M3U:").pack(padx=10, pady=10)
-        m3u_entry = Entry(m3u_window, width=50)
+        ttk.Label(m3u_window, text="URL M3U:").pack(padx=10, pady=10)
+        m3u_entry = ttk.Entry(m3u_window, width=50)
         m3u_entry.pack(padx=10, pady=10)
-        Button(m3u_window, text="Charger", command=lambda: asyncio.run(self.load_subscriptions_from_m3u(m3u_entry.get()))).pack(padx=10, pady=10)
+        ttk.Button(m3u_window, text="Charger", command=lambda: asyncio.run(self.load_subscriptions_from_m3u(m3u_entry.get()))).pack(padx=10, pady=10)
 
     def update_listbox(self):
         self.listbox.delete(0, END)
@@ -165,12 +173,16 @@ class IPTVApp:
             index = selected[0]
             entry = self.listbox.get(index)
             parts = entry.split(" - ")
-            mac = parts[0].split(": ")[1]
             url = parts[1].split(": ")[1]
-            from streaming import StreamManager
-            stream_manager = StreamManager()
-            stream_manager.play_with_vlc(url)
-            messagebox.showinfo("Stream Info", f"Playing stream for MAC: {mac} on URL: {url}")
+            self.play_video(url)
+
+    def play_video(self, url):
+        instance = vlc.Instance()
+        player = instance.media_player_new()
+        media = instance.media_new(url)
+        player.set_media(media)
+        player.set_xwindow(self.video_canvas.winfo_id())
+        player.play()
 
     def add_to_favorites(self):
         selected = self.listbox.curselection()
@@ -219,15 +231,15 @@ class IPTVApp:
     def open_settings(self):
         settings_window = Toplevel(self.root)
         settings_window.title("Réglages")
-        Label(settings_window, text="Réglages").pack(padx=10, pady=10)
+        ttk.Label(settings_window, text="Réglages").pack(padx=10, pady=10)
 
     def open_webpage_input(self):
         webpage_window = Toplevel(self.root)
         webpage_window.title("Analyser Page Web")
-        Label(webpage_window, text="URL:").pack(padx=10, pady=10)
-        url_entry = Entry(webpage_window, width=50)
+        ttk.Label(webpage_window, text="URL:").pack(padx=10, pady=10)
+        url_entry = ttk.Entry(webpage_window, width=50)
         url_entry.pack(padx=10, pady=10)
-        Button(webpage_window, text="Analyser", command=lambda: self.analyze_webpage(url_entry.get())).pack(padx=10, pady=10)
+        ttk.Button(webpage_window, text="Analyser", command=lambda: self.analyze_webpage(url_entry.get())).pack(padx=10, pady=10)
 
     def analyze_webpage(self, url):
         messagebox.showinfo("Analyser Page Web", f"Analyzing {url}")
