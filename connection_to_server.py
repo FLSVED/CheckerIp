@@ -4,7 +4,6 @@ from error_handling import ConnectionError
 import asyncio
 
 class ServerConnection:
-
     def __init__(self, server_url, mac_address, headers=None):
         self.server_url = server_url
         self.mac_address = mac_address
