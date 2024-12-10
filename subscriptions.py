@@ -3,7 +3,7 @@ import logging
 import asyncio
 from connection_to_server import ServerConnection
 from error_handling import ConnectionError
-from m3u_parser import M3UParser  # Hypothetical module for parsing M3U files
+from m3u_parser import M3uParser  # Correct import for M3uParser
 
 __version__ = "2.0.0"
 
@@ -64,7 +64,7 @@ class SubscriptionManager:
         return results
 
     async def load_subscriptions_from_m3u(self, m3u_url):
-        parser = M3UParser(m3u_url)
+        parser = M3uParser(m3u_url)
         playlist = parser.get_playlist()
         tasks = [self.add_subscription_async(item['url'], item['mac']) for item in playlist]
         results = await asyncio.gather(*tasks)
