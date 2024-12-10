@@ -3,6 +3,7 @@ import logging
 import asyncio
 from connection_to_server import ServerConnection
 from error_handling import ConnectionError
+from m3u_parser import M3UParser  # Hypothetical module for parsing M3U files
 
 __version__ = "2.0.0"
 
@@ -58,6 +59,14 @@ class SubscriptionManager:
     async def load_subscriptions_from_text(self, text):
         urls, devices = self.parse_data(text)
         tasks = [self.add_subscription_async(url, device['mac']) for url in urls for device in devices]
+        results = await asyncio.gather(*tasks)
+        logging.info(f"Subscription results: {results}")
+        return results
+
+    async def load_subscriptions_from_m3u(self, m3u_url):
+        parser = M3UParser(m3u_url)
+        playlist = parser.get_playlist()
+        tasks = [self.add_subscription_async(item['url'], item['mac']) for item in playlist]
         results = await asyncio.gather(*tasks)
         logging.info(f"Subscription results: {results}")
         return results
