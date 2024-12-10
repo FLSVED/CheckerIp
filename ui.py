@@ -7,24 +7,24 @@ from subscriptions import SubscriptionManager
 from vod import VodManager
 from epg import EpgManager
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 
 class IPTVApp:
-    def __init__(self, root, config, server_url=None, mac_address=None):
+    def __init__(self, root, config_manager):
         self.root = root
         self.root.title("IPTV Manager")
-        self.config = config
-        self.server_url = server_url
-        self.mac_address = mac_address
+        self.config_manager = config_manager
+        self.server_url = config_manager.get('server_url')
+        self.mac_address = config_manager.get('mac_address')
         
         self.subscription_manager = SubscriptionManager()
         self.vod_manager = VodManager()
         self.epg_manager = EpgManager()
 
         self.player_choice = StringVar(value="VLC")
-        self.external_player_paths = self.config['external_players']
+        self.external_player_paths = config_manager.get('external_players')
 
-        self.favorites = []  # Add a list to store favorites
+        self.favorites = []
 
         self.create_main_widgets()
         threading.Thread(target=self.periodic_connectivity_check, daemon=True).start()
@@ -77,7 +77,6 @@ class IPTVApp:
         self.load_epg_button = Button(frame, text=self.translate("Charger EPG"), command=self.load_epg_from_server)
         self.load_epg_button.grid(row=11, column=2, padx=5, pady=5)
 
-        # Options de filtre et de tri
         self.filter_var = StringVar(value="Tous")
         Label(frame, text=self.translate("Filtrer par statut:")).grid(row=12, column=0, padx=5, pady=5)
         self.filter_menu = OptionMenu(frame, self.filter_var, "Tous", "Actif", "Inactif", command=self.apply_filter)
@@ -120,7 +119,7 @@ class IPTVApp:
         while True:
             await self.subscription_manager.check_connectivity_async()
             self.update_listbox()
-            await asyncio.sleep(60)  # Check connectivity every 60 seconds
+            await asyncio.sleep(60)
 
     def view_stream(self):
         selected = self.listbox.curselection()
@@ -130,7 +129,6 @@ class IPTVApp:
             parts = entry.split(" - ")
             mac = parts[0].split(": ")[1]
             url = parts[1].split(": ")[1]
-            # Dynamically import StreamManager to avoid circular import
             from streaming import StreamManager
             stream_manager = StreamManager()
             stream_manager.play_with_vlc(url)
@@ -166,7 +164,7 @@ class IPTVApp:
         if not search_query:
             messagebox.showwarning("Attention", "Veuillez entrer un terme de recherche.")
             return
-        results = self.vod_manager.search(search_query)
+        results = self.vod_manager.search_vod(search_query)
         if results:
             self.show_vod_results(results)
         else:
@@ -198,8 +196,10 @@ class IPTVApp:
 
     def load_epg_from_server(self):
         epg_data = self.epg_manager.load_epg()
-        messagebox.showinfo("EPG", "EPG data loaded from server.")
+        if epg_data:
+            messagebox.showinfo("EPG", "EPG data loaded from server.")
+        else:
+            messagebox.showwarning("EPG", "Failed to load EPG data.")
 
     def apply_filter(self, selected_filter):
-        # Implement the filtering logic here
         messagebox.showinfo("Filtre", f"Filtrage appliqué: {selected_filter}")
