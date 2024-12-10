@@ -1,4 +1,4 @@
-from tkinter import Listbox, Button, Scrollbar, END, messagebox, StringVar, Entry, Label, Frame, OptionMenu, Toplevel, Canvas
+from tkinter import Listbox, Scrollbar, END, messagebox, StringVar, Canvas, Toplevel
 from tkinter import ttk
 import threading
 import logging
