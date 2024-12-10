@@ -77,10 +77,13 @@ class IPTVApp:
         self.load_epg_button = Button(frame, text=self.translate("Charger EPG"), command=self.load_epg_from_server)
         self.load_epg_button.grid(row=11, column=2, padx=5, pady=5)
 
+        self.paste_text_button = Button(frame, text=self.translate("Coller Texte"), command=self.open_text_input)
+        self.paste_text_button.grid(row=12, column=2, padx=5, pady=5)
+
         self.filter_var = StringVar(value="Tous")
-        Label(frame, text=self.translate("Filtrer par statut:")).grid(row=12, column=0, padx=5, pady=5)
+        Label(frame, text=self.translate("Filtrer par statut:")).grid(row=13, column=0, padx=5, pady=5)
         self.filter_menu = OptionMenu(frame, self.filter_var, "Tous", "Actif", "Inactif", command=self.apply_filter)
-        self.filter_menu.grid(row=12, column=1, padx=5, pady=5)
+        self.filter_menu.grid(row=13, column=1, padx=5, pady=5)
 
     def translate(self, text):
         return text
@@ -102,6 +105,14 @@ class IPTVApp:
         except Exception as e:
             logging.error(f"Erreur lors du chargement du presse-papiers: {e}")
             messagebox.showerror("Erreur", "Impossible de charger les abonnements depuis le presse-papiers.")
+
+    async def load_subscriptions_from_text(self, text):
+        results = await self.subscription_manager.load_subscriptions_from_text(text)
+        self.update_listbox()
+        if results:
+            messagebox.showinfo("Info", "Les abonnements ont été chargés depuis le texte.")
+        else:
+            messagebox.showerror("Erreur", "Impossible de charger les abonnements depuis le texte.")
 
     def update_listbox(self):
         self.listbox.delete(0, END)
