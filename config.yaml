@@ -1,0 +1,13 @@
+version: "2.0.0"
+
+external_players:
+
+MPV: "C:/Program Files/mpv/mpv.exe"
+
+PotPlayer: "C:/Program Files/DAUM/PotPlayer/PotPlayerMini64.exe"
+
+default_language: "fr"
+
+server_url: "YOUR_SERVER_URL"
+
+mac_address: "YOUR_MAC_ADDRESS"
