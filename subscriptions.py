@@ -53,6 +53,14 @@ class SubscriptionManager:
         tasks = [self.add_subscription_async(url, device['mac']) for url in urls for device in devices]
         results = await asyncio.gather(*tasks)
         logging.info(f"Subscription results: {results}")
+        return results
+
+    async def load_subscriptions_from_text(self, text):
+        urls, devices = self.parse_data(text)
+        tasks = [self.add_subscription_async(url, device['mac']) for url in urls for device in devices]
+        results = await asyncio.gather(*tasks)
+        logging.info(f"Subscription results: {results}")
+        return results
 
     async def check_connectivity_async(self):
         tasks = []
