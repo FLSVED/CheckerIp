@@ -80,10 +80,13 @@ class IPTVApp:
         self.paste_text_button = Button(frame, text=self.translate("Coller Texte"), command=self.open_text_input)
         self.paste_text_button.grid(row=12, column=2, padx=5, pady=5)
 
+        self.m3u_button = Button(frame, text=self.translate("Charger M3U"), command=self.open_m3u_input)
+        self.m3u_button.grid(row=13, column=2, padx=5, pady=5)
+
         self.filter_var = StringVar(value="Tous")
-        Label(frame, text=self.translate("Filtrer par statut:")).grid(row=13, column=0, padx=5, pady=5)
+        Label(frame, text=self.translate("Filtrer par statut:")).grid(row=14, column=0, padx=5, pady=5)
         self.filter_menu = OptionMenu(frame, self.filter_var, "Tous", "Actif", "Inactif", command=self.apply_filter)
-        self.filter_menu.grid(row=13, column=1, padx=5, pady=5)
+        self.filter_menu.grid(row=14, column=1, padx=5, pady=5)
 
     def translate(self, text):
         return text
@@ -113,6 +116,30 @@ class IPTVApp:
             messagebox.showinfo("Info", "Les abonnements ont été chargés depuis le texte.")
         else:
             messagebox.showerror("Erreur", "Impossible de charger les abonnements depuis le texte.")
+
+    async def load_subscriptions_from_m3u(self, m3u_url):
+        results = await self.subscription_manager.load_subscriptions_from_m3u(m3u_url)
+        self.update_listbox()
+        if results:
+            messagebox.showinfo("Info", "Les abonnements ont été chargés depuis le lien M3U.")
+        else:
+            messagebox.showerror("Erreur", "Impossible de charger les abonnements depuis le lien M3U.")
+
+    def open_text_input(self):
+        text_window = Toplevel(self.root)
+        text_window.title("Coller Texte")
+        Label(text_window, text="Texte:").pack(padx=10, pady=10)
+        text_entry = Entry(text_window, width=50)
+        text_entry.pack(padx=10, pady=10)
+        Button(text_window, text="Charger", command=lambda: asyncio.run(self.load_subscriptions_from_text(text_entry.get()))).pack(padx=10, pady=10)
+
+    def open_m3u_input(self):
+        m3u_window = Toplevel(self.root)
+        m3u_window.title("Charger M3U")
+        Label(m3u_window, text="URL M3U:").pack(padx=10, pady=10)
+        m3u_entry = Entry(m3u_window, width=50)
+        m3u_entry.pack(padx=10, pady=10)
+        Button(m3u_window, text="Charger", command=lambda: asyncio.run(self.load_subscriptions_from_m3u(m3u_entry.get()))).pack(padx=10, pady=10)
 
     def update_listbox(self):
         self.listbox.delete(0, END)
