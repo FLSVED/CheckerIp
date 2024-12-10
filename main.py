@@ -1,22 +1,30 @@
-import json
+python
 from tkinter import Tk
 from ui import IPTVApp
-from config import load_config, get_server_url, get_mac_address, load_additional_sources
-
+from config_manager import ConfigManager
+import logging
+def setup_logging():
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 def main():
-    config = load_config()
-    server_url = get_server_url(config)
-    mac_address = get_mac_address(config)
-    
-    if not server_url or not mac_address:
-        server_url, mac_address = load_additional_sources()
+setup_logging()
+config_manager = ConfigManager()
+server_url = config_manager.get('server_url')
+mac_address = config_manager.get('mac_address')
 
-    if not server_url or not mac_address:
-        raise ValueError("Server URL or MAC address is missing in the configuration or additional sources.")
-    
-    root = Tk()
-    app = IPTVApp(root, config, server_url, mac_address)
-    root.mainloop()
+if not server_url or not mac_address:
+
+logging.error("Server URL or MAC address is missing in the configuration.")
+
+return
+
+
+root = Tk()
+
+app = IPTVApp(root, config_manager)
+
+root.mainloop()
+
 
 if __name__ == "__main__":
-    main()
+
+main()
