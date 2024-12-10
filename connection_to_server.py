@@ -13,15 +13,21 @@ class ServerConnection:
         }
 
     async def connect(self):
-        try:
-            async with aiohttp.ClientSession() as session:
-                try:
+        retries = 3
+        for attempt in range(retries):
+            try:
+                async with aiohttp.ClientSession() as session:
                     async with session.get(self.server_url, headers=self.headers, timeout=60) as response:
                         logging.info(f"Response status: {response.status} for MAC {self.mac_address} at {self.server_url}")
-                        return response.status == 200
-                except asyncio.TimeoutError:
-                    logging.error(f"Timeout error for MAC {self.mac_address} at {self.server_url}")
-                    raise ConnectionError(f"Timeout while connecting to {self.server_url}")
-        except aiohttp.ClientError as e:
-            logging.error(f"Client error for MAC {self.mac_address} at {self.server_url}: {e}")
-            raise ConnectionError(f"Failed to connect to {self.server_url}") from e
+                        if response.status == 200:
+                            return True
+                        else:
+                            logging.warning(f"Non-200 status code: {response.status}")
+                            return False
+            except asyncio.TimeoutError:
+                logging.error(f"Timeout error for MAC {self.mac_address} at {self.server_url}")
+            except aiohttp.ClientError as e:
+                logging.error(f"Client error for MAC {self.mac_address} at {self.server_url}: {e}")
+            await asyncio.sleep(2 ** attempt)  # Exponential backoff
+
+        raise ConnectionError(f"Failed to connect to {self.server_url} after {retries} attempts")
