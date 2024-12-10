@@ -3,7 +3,7 @@ import logging
 import asyncio
 from connection_to_server import ServerConnection
 from error_handling import ConnectionError
-from m3u_parser import M3uParser  # Correct import for M3uParser
+from m3u_parser import M3uParser
 
 __version__ = "2.0.0"
 
