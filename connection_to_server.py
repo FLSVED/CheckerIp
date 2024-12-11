@@ -2,6 +2,10 @@ import aiohttp
 import logging
 from error_handling import ConnectionError
 import asyncio
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
 
 class ServerConnection:
     def __init__(self, server_url, mac_address=None, headers=None):
@@ -32,17 +36,11 @@ class ServerConnection:
 
         raise ConnectionError(f"Failed to connect to {self.server_url} after {retries} attempts")
 
-    async def fetch_server_content(self):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(self.server_url, headers=self.headers) as response:
-                if response.status == 200:
-                    if response.content_type == 'application/json':
-                        return await response.json()
-                    elif response.content_type == 'text/html':
-                        return await response.text()
-                    else:
-                        logging.error(f"Unexpected content type: {response.content_type}")
-                        return None
-                else:
-                    logging.error(f"Failed to fetch server content: {response.status}")
-                    return None
+    def fetch_server_content(self):
+        options = Options()
+        options.headless = True
+        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+        driver.get(self.server_url)
+        content = driver.page_source
+        driver.quit()
+        return content
