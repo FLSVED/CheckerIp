@@ -1,7 +1,6 @@
 from tkinter import messagebox, ttk, Listbox, Scrollbar, Canvas, Toplevel, Label, Entry, Menu
 import asyncio
 import vlc
-import requests
 from html.parser import HTMLParser
 from connection_to_server import ServerConnection
 from subscriptions import SubscriptionManager
@@ -116,23 +115,17 @@ class IPTVApp:
 
         connection = ServerConnection(url, self.config_manager.get('mac_address'))
 
-        async def show_content():
-            content = await connection.fetch_server_content()
+        def show_content():
+            content = connection.fetch_server_content()
             if content:
-                if isinstance(content, dict):
-                    for key, value in content.items():
-                        ttk.Label(content_window, text=f"{key}: {value}").pack()
-                elif isinstance(content, str):
-                    parser = IPTVContentParser()
-                    parser.feed(content)
-                    for item in parser.content:
-                        ttk.Label(content_window, text=item).pack()
-                else:
-                    ttk.Label(content_window, text="Contenu du serveur n'est pas au format JSON ou HTML").pack()
+                parser = IPTVContentParser()
+                parser.feed(content)
+                for item in parser.content:
+                    ttk.Label(content_window, text=item).pack()
             else:
                 ttk.Label(content_window, text="Failed to fetch server content").pack()
 
-        asyncio.run(show_content())
+        show_content()
 
     def translate(self, text):
         return text
