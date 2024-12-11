@@ -1,6 +1,5 @@
 import aiohttp
 import logging
-from error_handling import ConnectionError
 import asyncio
 from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.common.exceptions import WebDriverException
