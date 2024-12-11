@@ -126,4 +126,7 @@ class IPTVApp:
         for line in report:
             logging.info(line)
 
-    # Additional methods for periodic connectivity check, updating listbox, etc.
+    def periodic_connectivity_check(self):
+        while True:
+            asyncio.run(self.subscription_manager.check_connectivity_async())
+            time.sleep(60)  # Pause for 60 seconds between checks
