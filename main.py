@@ -4,8 +4,7 @@ from tkinter import Tk
 from ui import IPTVApp
 from config_manager import ConfigManager
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 
 def setup_logging():
@@ -40,8 +39,9 @@ def setup_chromedriver():
     options.add_argument("--disable-dev-shm-usage")
     
     try:
-        return webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
-    except ValueError as e:
+        service = Service()
+        return webdriver.Chrome(service=service, options=options)
+    except Exception as e:
         logging.error(f"Error setting up ChromeDriver: {e}")
         raise
 
