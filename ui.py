@@ -2,6 +2,7 @@ from tkinter import messagebox, ttk, Listbox, Scrollbar, Canvas, Toplevel, Label
 import asyncio
 import vlc
 import json
+import os
 from html.parser import HTMLParser
 from connection_to_server import ServerConnection
 from subscriptions import SubscriptionManager
@@ -184,16 +185,16 @@ class IPTVApp:
 
     def load_stored_subscription(self):
         # Load the stored subscription credentials if available
-        try:
+        if os.path.exists('subscription.json'):
             with open('subscription.json', 'r') as f:
                 data = json.load(f)
                 self.stored_subscription = (data['url'], data['mac'])
-        except FileNotFoundError:
+        else:
             self.stored_subscription = None
 
     def auto_connect(self):
         # Automatically connect using stored credentials if available
-        if hasattr(self, 'stored_subscription'):
+        if self.stored_subscription:
             url, mac = self.stored_subscription
             connection = ServerConnection(url, mac)
             asyncio.run(connection.connect())
