@@ -6,6 +6,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import WebDriverException
 
 class ServerConnection:
     def __init__(self, server_url, mac_address=None, headers=None):
@@ -45,6 +46,6 @@ class ServerConnection:
             content = driver.page_source
             driver.quit()
             return content
-        except Exception as e:
+        except WebDriverException as e:
             logging.error(f"WebDriver error: {e}")
             return None
