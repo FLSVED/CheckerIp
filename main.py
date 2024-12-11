@@ -40,7 +40,8 @@ def setup_chromedriver():
     options.add_argument("--disable-dev-shm-usage")
     
     try:
-        service = Service()
+        # Ensure the path to chromedriver.exe is correctly specified
+        service = Service("C:/Users/pc/chromedriver/chromedriver.exe")
         return webdriver.Chrome(service=service, options=options)
     except Exception as e:
         logging.error(f"Error setting up ChromeDriver: {e}")
