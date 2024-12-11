@@ -38,6 +38,8 @@ class ServerConnection:
                 if response.status == 200:
                     if response.content_type == 'application/json':
                         return await response.json()
+                    elif response.content_type == 'text/html':
+                        return await response.text()
                     else:
                         logging.error(f"Unexpected content type: {response.content_type}")
                         return None
