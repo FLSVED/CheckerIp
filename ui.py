@@ -1,5 +1,6 @@
 from tkinter import messagebox, ttk, Listbox, Scrollbar, Canvas, Toplevel, Label, Entry, Menu
 import asyncio
+import vlc
 from connection_to_server import ServerConnection
 from subscriptions import SubscriptionManager
 
@@ -105,8 +106,12 @@ class IPTVApp:
                 if isinstance(content, dict):
                     for key, value in content.items():
                         ttk.Label(content_window, text=f"{key}: {value}").pack()
+                elif isinstance(content, str):
+                    ttk.Label(content_window, text="Contenu du serveur (HTML):").pack()
+                    html_label = ttk.Label(content_window, text=content, wraplength=500)
+                    html_label.pack()
                 else:
-                    ttk.Label(content_window, text="Contenu du serveur n'est pas au format JSON").pack()
+                    ttk.Label(content_window, text="Contenu du serveur n'est pas au format JSON ou HTML").pack()
             else:
                 ttk.Label(content_window, text="Failed to fetch server content").pack()
 
