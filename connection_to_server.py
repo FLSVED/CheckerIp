@@ -36,7 +36,11 @@ class ServerConnection:
         async with aiohttp.ClientSession() as session:
             async with session.get(self.server_url, headers=self.headers) as response:
                 if response.status == 200:
-                    return await response.json()
+                    if response.content_type == 'application/json':
+                        return await response.json()
+                    else:
+                        logging.error(f"Unexpected content type: {response.content_type}")
+                        return None
                 else:
                     logging.error(f"Failed to fetch server content: {response.status}")
                     return None
