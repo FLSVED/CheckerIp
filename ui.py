@@ -1,11 +1,13 @@
-from tkinter import messagebox, ttk, Listbox, Scrollbar, Canvas, Toplevel
+from tkinter import messagebox, ttk, Listbox, Scrollbar, Canvas, Toplevel, Label, Entry, Menu
 import asyncio
 from connection_to_server import ServerConnection
+from subscriptions import SubscriptionManager
 
 class IPTVApp:
     def __init__(self, root, config_manager):
         self.root = root
         self.config_manager = config_manager
+        self.subscription_manager = SubscriptionManager()
         self.create_main_widgets()
 
     def create_main_widgets(self):
@@ -25,14 +27,15 @@ class IPTVApp:
         scrollbar.grid(row=1, column=1, rowspan=6, sticky='ns')
         self.listbox.config(yscrollcommand=scrollbar.set)
 
-        self.add_from_file_button = ttk.Button(frame, text=self.translate("Ajouter depuis un fichier"), command=self.load_from_file)
-        self.add_from_file_button.grid(row=1, column=2, padx=5, pady=5)
+        add_provider_menu = Menu(frame, tearoff=0)
+        add_provider_menu.add_command(label=self.translate("Xtream"), command=self.add_xtream)
+        add_provider_menu.add_command(label=self.translate("MAC Portal"), command=self.add_mac_portal)
+        add_provider_menu.add_command(label=self.translate("Stalker Portal"), command=self.add_stalker_portal)
+        add_provider_menu.add_command(label=self.translate("Fichier Playlist"), command=self.add_playlist_file)
+        add_provider_menu.add_command(label=self.translate("Playlist"), command=self.add_playlist)
 
-        self.add_manual_button = ttk.Button(frame, text=self.translate("Ajouter manuellement"), command=self.add_manual_subscription)
-        self.add_manual_button.grid(row=2, column=2, padx=5, pady=5)
-
-        self.add_from_web_button = ttk.Button(frame, text=self.translate("Ajouter depuis un lien web"), command=self.add_from_web)
-        self.add_from_web_button.grid(row=3, column=2, padx=5, pady=5)
+        add_provider_button = ttk.Menubutton(frame, text=self.translate("Ajouter fournisseur"), menu=add_provider_menu)
+        add_provider_button.grid(row=1, column=2, padx=5, pady=5)
 
         self.view_button = ttk.Button(frame, text=self.translate("PLAY"), command=self.view_stream)
         self.view_button.grid(row=4, column=2, padx=5, pady=5)
@@ -49,6 +52,26 @@ class IPTVApp:
     def quit_app(self):
         if messagebox.askokcancel("Quit", "Voulez-vous vraiment quitter?"):
             self.root.destroy()
+
+    def add_xtream(self):
+        # Implement Xtream addition logic
+        pass
+
+    def add_mac_portal(self):
+        # Implement MAC Portal addition logic
+        pass
+
+    def add_stalker_portal(self):
+        # Implement Stalker Portal addition logic
+        pass
+
+    def add_playlist_file(self):
+        # Implement Playlist File addition logic
+        pass
+
+    def add_playlist(self):
+        # Implement Playlist addition logic
+        pass
 
     def display_server_content(self, url):
         content_window = Toplevel(self.root)
@@ -71,25 +94,44 @@ class IPTVApp:
         return text
 
     def on_subscription_select(self, event):
-        # Placeholder for subscription select event handler.
-        pass
+        selected = self.listbox.curselection()
+        if selected:
+            index = selected[0]
+            entry = self.listbox.get(index)
+            parts = entry.split(" - ")
+            url = parts[0].split(": ")[1]
+            self.display_server_content(url)
 
-    def load_from_file(self):
-        # Placeholder for loading from file.
-        pass
-
-    def add_manual_subscription(self):
-        # Placeholder for adding manual subscription.
-        pass
-
-    def add_from_web(self):
-        # Placeholder for adding from web.
-        pass
+    def update_listbox(self):
+        self.listbox.delete(0, 'end')
+        for url, devices in self.subscription_manager.subscriptions.items():
+            for device in devices:
+                if device['active']:
+                    self.listbox.insert('end', f"Server: {url} - MAC: {device['mac']}")
 
     def view_stream(self):
-        # Placeholder for viewing stream.
-        pass
+        selected = self.listbox.curselection()
+        if selected:
+            index = selected[0]
+            entry = self.listbox.get(index)
+            parts = entry.split(" - ")
+            url = parts[0].split(": ")[1]
+            self.play_video(url)
+
+    def play_video(self, url):
+        instance = vlc.Instance()
+        player = instance.media_player_new()
+        media = instance.media_new(url)
+        player.set_media(media)
+        player.set_xwindow(self.video_canvas.winfo_id())
+        player.play()
 
     def add_to_favorites(self):
-        # Placeholder for adding to favorites.
-        pass
+        selected = self.listbox.curselection()
+        if selected:
+            index = selected[0]
+            entry = self.listbox.get(index)
+            parts = entry.split(" - ")
+            url = parts[0].split(": ")[1]
+            # Implement the logic to add to favorites
+            pass
