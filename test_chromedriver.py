@@ -1,39 +1,10 @@
 import logging
-import threading
-from tkinter import Tk
-from ui import IPTVApp
-from config_manager import ConfigManager
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-import test_chromedriver  # Import the test script
 
-def setup_logging():
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-def test_server_connection(server_url, mac_address):
-    logging.info(f"Testing connection to server: {server_url} with MAC: {mac_address}")
-    # Implement actual connection test logic here
-    return True
-
-def run_analysis(config_manager):
-    server_url = config_manager.get('server_url')
-    mac_address = config_manager.get('mac_address')
-
-    if not server_url or not mac_address:
-        logging.error("Server URL or MAC address is missing in the configuration.")
-        return
-
-    if not test_server_connection(server_url, mac_address):
-        logging.error("Failed to connect to the server.")
-        return
-
-    from subscriptions import SubscriptionManager
-    manager = SubscriptionManager()
-    # Replace with a valid method or remove if unnecessary
-    # manager.load_default_subscriptions()
-
-def setup_chromedriver():
+def run_test():
+    """Test fetching URL and cookie using Chrome Driver."""
     options = Options()
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
@@ -41,29 +12,27 @@ def setup_chromedriver():
     
     try:
         service = Service()
-        return webdriver.Chrome(service=service, options=options)
+        driver = webdriver.Chrome(service=service, options=options)
     except Exception as e:
         logging.error(f"Error setting up ChromeDriver: {e}")
         raise
 
-def main():
-    setup_logging()
-    config_manager = ConfigManager()
+    test_url = 'https://www.google.com/'
+    expected_title = 'Google'
+    domain = '.google.com'
 
-    # Run the ChromeDriver test
-    test_chromedriver.run_test()
-
-    # Initialize chromedriver at the start
     try:
-        driver = setup_chromedriver()
-    except Exception as e:
-        logging.error(f"Failed to initialize ChromeDriver: {e}")
-        return
-
-    root = Tk()
-    app = IPTVApp(root, config_manager, driver)
-    threading.Thread(target=run_analysis, args=(config_manager,), daemon=True).start()
-    root.mainloop()
-
-if __name__ == "__main__":
-    main()
+        driver.get(test_url)
+        logging.info('Expected tab title: %s. Got: %s', expected_title, driver.title)
+        if driver.title != expected_title:
+            raise Exception('Getting title failed, got title: %s' % driver.title)
+        cookie_found = any([
+                cookie for cookie in driver.get_cookies()
+                if cookie['domain'] == domain
+        ])
+        if not cookie_found:
+            raise Exception(
+                    'Expected cookie for %s. Found: %s' %
+                    (test_url, [c['domain'] for c in driver.get_cookies()]))
+    finally:
+        driver.quit()
