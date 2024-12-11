@@ -3,6 +3,10 @@ import threading
 from tkinter import Tk
 from ui import IPTVApp
 from config_manager import ConfigManager
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
 
 def setup_logging():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -29,12 +33,22 @@ def run_analysis(config_manager):
     # Replace with a valid method or remove if unnecessary
     # manager.load_default_subscriptions()
 
+def setup_chromedriver():
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    return webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+
 def main():
     setup_logging()
     config_manager = ConfigManager()
 
+    # Initialize chromedriver at the start
+    driver = setup_chromedriver()
+
     root = Tk()
-    app = IPTVApp(root, config_manager)
+    app = IPTVApp(root, config_manager, driver)
     threading.Thread(target=run_analysis, args=(config_manager,), daemon=True).start()
     root.mainloop()
 
