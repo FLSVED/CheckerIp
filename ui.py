@@ -1,4 +1,4 @@
-from tkinter import Listbox, Scrollbar, END, messagebox, StringVar, Canvas, Toplevel, filedialog, Entry, Label
+from tkinter import Listbox, Scrollbar, END, messagebox, StringVar, Canvas, Toplevel, filedialog, Entry, Label, Button
 from tkinter import ttk
 import threading
 import logging
@@ -43,6 +43,7 @@ class IPTVApp:
 
         self.listbox = Listbox(frame, width=50)
         self.listbox.grid(row=1, column=0, rowspan=6, padx=5, pady=5)
+        self.listbox.bind('<<ListboxSelect>>', self.on_subscription_select)
 
         scrollbar = Scrollbar(frame, orient='vertical', command=self.listbox.yview)
         scrollbar.grid(row=1, column=1, rowspan=6, sticky='ns')
@@ -72,6 +73,7 @@ class IPTVApp:
             with open(file_path, 'r', encoding='utf-8') as file:
                 data = file.read()
             asyncio.run(self.subscription_manager.load_subscriptions_from_text(data))
+            self.update_listbox()
 
     def add_manual_subscription(self):
         manual_window = Toplevel(self.root)
@@ -89,6 +91,7 @@ class IPTVApp:
             url = url_entry.get()
             mac = mac_entry.get()
             asyncio.run(self.subscription_manager.add_subscription_async(url, mac))
+            self.update_listbox()
             manual_window.destroy()
 
         add_button = ttk.Button(manual_window, text="Ajouter", command=add_subscription)
@@ -105,10 +108,35 @@ class IPTVApp:
         def add_subscription():
             url = url_entry.get()
             asyncio.run(self.subscription_manager.load_subscriptions_from_m3u(url))
+            self.update_listbox()
             web_window.destroy()
 
         add_button = ttk.Button(web_window, text="Ajouter", command=add_subscription)
         add_button.grid(row=1, column=1, padx=5, pady=5)
+
+    def update_listbox(self):
+        self.listbox.delete(0, END)
+        for url, devices in self.subscription_manager.subscriptions.items():
+            for device in devices:
+                if device['active']:
+                    self.listbox.insert(END, f"Server: {url} - MAC: {device['mac']}")
+
+    def on_subscription_select(self, event):
+        selected = self.listbox.curselection()
+        if selected:
+            index = selected[0]
+            entry = self.listbox.get(index)
+            parts = entry.split(" - ")
+            url = parts[0].split(": ")[1]
+            self.display_server_content(url)
+
+    def display_server_content(self, url):
+        content_window = Toplevel(self.root)
+        content_window.title("Contenu du Serveur")
+
+        # Implement the logic to fetch and display server content
+        # For example, you could display TV channels, VOD, EPG, etc.
+        Label(content_window, text=f"Content from {url}").pack()
 
     def view_stream(self):
         selected = self.listbox.curselection()
@@ -116,7 +144,7 @@ class IPTVApp:
             index = selected[0]
             entry = self.listbox.get(index)
             parts = entry.split(" - ")
-            url = parts[1].split(": ")[1]
+            url = parts[0].split(": ")[1]
             self.play_video(url)
 
     def play_video(self, url):
