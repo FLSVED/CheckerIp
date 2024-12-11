@@ -1,8 +1,24 @@
 from tkinter import messagebox, ttk, Listbox, Scrollbar, Canvas, Toplevel, Label, Entry, Menu
 import asyncio
 import vlc
+import requests
+from html.parser import HTMLParser
 from connection_to_server import ServerConnection
 from subscriptions import SubscriptionManager
+
+class IPTVContentParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.content = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "a":
+            for attr in attrs:
+                if attr[0] == "href":
+                    self.content.append(attr[1])
+
+    def handle_data(self, data):
+        self.content.append(data)
 
 class IPTVApp:
     def __init__(self, root, config_manager):
@@ -107,9 +123,10 @@ class IPTVApp:
                     for key, value in content.items():
                         ttk.Label(content_window, text=f"{key}: {value}").pack()
                 elif isinstance(content, str):
-                    ttk.Label(content_window, text="Contenu du serveur (HTML):").pack()
-                    html_label = ttk.Label(content_window, text=content, wraplength=500)
-                    html_label.pack()
+                    parser = IPTVContentParser()
+                    parser.feed(content)
+                    for item in parser.content:
+                        ttk.Label(content_window, text=item).pack()
                 else:
                     ttk.Label(content_window, text="Contenu du serveur n'est pas au format JSON ou HTML").pack()
             else:
