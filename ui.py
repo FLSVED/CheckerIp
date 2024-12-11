@@ -1,7 +1,12 @@
-from tkinter import messagebox
+from tkinter import messagebox, ttk, Listbox, Scrollbar, Canvas, Toplevel
+import asyncio
+from connection_to_server import ServerConnection
 
 class IPTVApp:
-    # Existing code...
+    def __init__(self, root, config_manager):
+        self.root = root
+        self.config_manager = config_manager
+        self.create_main_widgets()
 
     def create_main_widgets(self):
         style = ttk.Style()
@@ -45,4 +50,46 @@ class IPTVApp:
         if messagebox.askokcancel("Quit", "Voulez-vous vraiment quitter?"):
             self.root.destroy()
 
-    # Existing code...
+    def display_server_content(self, url):
+        content_window = Toplevel(self.root)
+        content_window.title("Contenu du Serveur")
+
+        connection = ServerConnection(url, self.config_manager.get('mac_address'))
+
+        async def show_content():
+            content = await connection.fetch_server_content()
+            if content:
+                for key, value in content.items():
+                    ttk.Label(content_window, text=f"{key}: {value}").pack()
+            else:
+                ttk.Label(content_window, text="Failed to fetch server content").pack()
+
+        asyncio.run(show_content())
+
+    def translate(self, text):
+        # Dummy translation function to illustrate usage.
+        return text
+
+    def on_subscription_select(self, event):
+        # Placeholder for subscription select event handler.
+        pass
+
+    def load_from_file(self):
+        # Placeholder for loading from file.
+        pass
+
+    def add_manual_subscription(self):
+        # Placeholder for adding manual subscription.
+        pass
+
+    def add_from_web(self):
+        # Placeholder for adding from web.
+        pass
+
+    def view_stream(self):
+        # Placeholder for viewing stream.
+        pass
+
+    def add_to_favorites(self):
+        # Placeholder for adding to favorites.
+        pass
