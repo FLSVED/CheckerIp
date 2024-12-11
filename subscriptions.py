@@ -3,7 +3,7 @@ import logging
 import asyncio
 from connection_to_server import ServerConnection
 from error_handling import ConnectionError
-from m3u_parser import M3uParser
+# Assuming m3u_parser is implemented elsewhere
 
 __version__ = "2.0.0"
 
@@ -21,7 +21,7 @@ class SubscriptionManager:
 
         return urls, devices
 
-    async def add_subscription_async(self, server_url, mac_address):
+    async def add_subscription_async(self, server_url, mac_address=None):
         connection = ServerConnection(server_url, mac_address)
         try:
             if await connection.connect():
