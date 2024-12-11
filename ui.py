@@ -102,8 +102,11 @@ class IPTVApp:
         async def show_content():
             content = await connection.fetch_server_content()
             if content:
-                for key, value in content.items():
-                    ttk.Label(content_window, text=f"{key}: {value}").pack()
+                if isinstance(content, dict):
+                    for key, value in content.items():
+                        ttk.Label(content_window, text=f"{key}: {value}").pack()
+                else:
+                    ttk.Label(content_window, text="Contenu du serveur n'est pas au format JSON").pack()
             else:
                 ttk.Label(content_window, text="Failed to fetch server content").pack()
 
