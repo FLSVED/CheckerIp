@@ -31,3 +31,12 @@ class ServerConnection:
             await asyncio.sleep(2 ** attempt)  # Exponential backoff
 
         raise ConnectionError(f"Failed to connect to {self.server_url} after {retries} attempts")
+
+    async def fetch_server_content(self):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(self.server_url, headers=self.headers) as response:
+                if response.status == 200:
+                    return await response.json()
+                else:
+                    logging.error(f"Failed to fetch server content: {response.status}")
+                    return None
