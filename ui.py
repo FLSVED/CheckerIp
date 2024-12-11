@@ -54,24 +54,44 @@ class IPTVApp:
             self.root.destroy()
 
     def add_xtream(self):
-        # Implement Xtream addition logic
-        pass
+        self.add_manual_subscription("Xtream")
 
     def add_mac_portal(self):
-        # Implement MAC Portal addition logic
-        pass
+        self.add_manual_subscription("MAC Portal")
 
     def add_stalker_portal(self):
-        # Implement Stalker Portal addition logic
-        pass
+        self.add_manual_subscription("Stalker Portal")
 
     def add_playlist_file(self):
-        # Implement Playlist File addition logic
-        pass
+        self.add_manual_subscription("Fichier Playlist")
 
     def add_playlist(self):
-        # Implement Playlist addition logic
-        pass
+        self.add_manual_subscription("Playlist")
+
+    def add_manual_subscription(self, mode):
+        manual_window = Toplevel(self.root)
+        manual_window.title(f"Ajouter un Abonnement {mode}")
+
+        Label(manual_window, text="URL du Serveur:").grid(row=0, column=0, padx=5, pady=5)
+        url_entry = Entry(manual_window, width=50)
+        url_entry.grid(row=0, column=1, padx=5, pady=5)
+
+        if mode != "Xtream":
+            Label(manual_window, text="Adresse MAC:").grid(row=1, column=0, padx=5, pady=5)
+            mac_entry = Entry(manual_window, width=50)
+            mac_entry.grid(row=1, column=1, padx=5, pady=5)
+        else:
+            mac_entry = None
+
+        def add_subscription():
+            url = url_entry.get()
+            mac = mac_entry.get() if mac_entry else None
+            asyncio.run(self.subscription_manager.add_subscription_async(url, mac))
+            self.update_listbox()
+            manual_window.destroy()
+
+        add_button = ttk.Button(manual_window, text="Ajouter", command=add_subscription)
+        add_button.grid(row=2, column=1, padx=5, pady=5)
 
     def display_server_content(self, url):
         content_window = Toplevel(self.root)
@@ -90,7 +110,6 @@ class IPTVApp:
         asyncio.run(show_content())
 
     def translate(self, text):
-        # Dummy translation function to illustrate usage.
         return text
 
     def on_subscription_select(self, event):
@@ -133,5 +152,5 @@ class IPTVApp:
             entry = self.listbox.get(index)
             parts = entry.split(" - ")
             url = parts[0].split(": ")[1]
-            # Implement the logic to add to favorites
+            # Implement logic to add to favorites
             pass
