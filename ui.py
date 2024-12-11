@@ -4,6 +4,7 @@ import threading
 import logging
 import pyperclip
 import asyncio
+import time  # Add this import
 from subscriptions import SubscriptionManager
 from vod import VodManager
 from epg import EpgManager
@@ -71,7 +72,7 @@ class IPTVApp:
     def load_from_file(self):
         file_path = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
         if file_path:
-            with open(file_path, 'r') as file:
+            with open(file_path, 'r', encoding='utf-8') as file:  # Specify encoding
                 data = file.read()
             asyncio.run(self.subscription_manager.load_subscriptions_from_text(data))
 
