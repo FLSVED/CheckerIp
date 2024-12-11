@@ -34,26 +34,38 @@ class SubscriptionManager:
         return False
 
     async def manage_subscriptions_async(self, data):
-        urls, devices = self.parse_data(data)
-        tasks = [self.add_subscription_async(url, device['mac']) for url in urls for device in devices]
-        results = await asyncio.gather(*tasks)
-        logging.info(f"Subscription results: {results}")
-        return results
+        try:
+            urls, devices = self.parse_data(data)
+            tasks = [self.add_subscription_async(url, device['mac']) for url in urls for device in devices]
+            results = await asyncio.gather(*tasks)
+            logging.info(f"Subscription results: {results}")
+            return results
+        except Exception as e:
+            logging.error(f"Error managing subscriptions: {e}")
+            return []
 
     async def load_subscriptions_from_text(self, text):
-        urls, devices = self.parse_data(text)
-        tasks = [self.add_subscription_async(url, device['mac']) for url in urls for device in devices]
-        results = await asyncio.gather(*tasks)
-        logging.info(f"Subscription results: {results}")
-        return results
+        try:
+            urls, devices = self.parse_data(text)
+            tasks = [self.add_subscription_async(url, device['mac']) for url in urls for device in devices]
+            results = await asyncio.gather(*tasks)
+            logging.info(f"Subscription results: {results}")
+            return results
+        except Exception as e:
+            logging.error(f"Error loading subscriptions from text: {e}")
+            return []
 
     async def load_subscriptions_from_m3u(self, m3u_url):
-        parser = M3uParser(m3u_url)
-        playlist = parser.get_playlist()
-        tasks = [self.add_subscription_async(item['url'], item['mac']) for item in playlist]
-        results = await asyncio.gather(*tasks)
-        logging.info(f"Subscription results: {results}")
-        return results
+        try:
+            parser = M3uParser(m3u_url)
+            playlist = parser.get_playlist()
+            tasks = [self.add_subscription_async(item['url'], item['mac']) for item in playlist]
+            results = await asyncio.gather(*tasks)
+            logging.info(f"Subscription results: {results}")
+            return results
+        except Exception as e:
+            logging.error(f"Error loading subscriptions from m3u: {e}")
+            return []
 
     async def check_connectivity_async(self):
         tasks = []
