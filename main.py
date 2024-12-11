@@ -15,10 +15,10 @@ def run_analysis(config_manager):
         logging.error("Server URL or MAC address is missing in the configuration.")
         return
     
-    # Assuming SubscriptionManager is what runs the analysis
     from subscriptions import SubscriptionManager
     manager = SubscriptionManager()
-    manager.load_default_subscriptions()
+    # Replace with a valid method or remove if unnecessary
+    # manager.load_default_subscriptions()
 
 def main():
     setup_logging()
