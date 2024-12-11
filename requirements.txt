@@ -12,7 +12,7 @@ pyperclip==1.9.0
 python-vlc==3.0.21203
 pytz==2024.2
 requests==2.32.3
-urllib3==2.2.3
+urllib3==1.26.16
 yarl==1.18.3
 selenium==4.6.0
 webdriver-manager==3.8.3
