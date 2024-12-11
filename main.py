@@ -6,6 +6,7 @@ from config_manager import ConfigManager
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+import test_chromedriver  # Import the test script
 
 def setup_logging():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -48,6 +49,9 @@ def setup_chromedriver():
 def main():
     setup_logging()
     config_manager = ConfigManager()
+
+    # Run the ChromeDriver test
+    test_chromedriver.run_test()
 
     # Initialize chromedriver at the start
     try:
