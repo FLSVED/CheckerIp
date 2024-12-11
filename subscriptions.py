@@ -7,26 +7,10 @@ from m3u_parser import M3uParser
 
 __version__ = "2.0.0"
 
-DEFAULT_SUBSCRIPTIONS = """
-http://new.ivue.co:25461/c
-    00:1A:79:70:E2:97
-    00:1A:79:58:11:68
-    00:1A:79:63:E8:E2
-    ...
-"""
-
 class SubscriptionManager:
     def __init__(self):
         self.subscriptions = {}
         self.connectivity_failures = {}
-        self.load_default_subscriptions()
-
-    def load_default_subscriptions(self):
-        urls, devices = self.parse_data(DEFAULT_SUBSCRIPTIONS)
-        if not urls or not devices:
-            logging.warning("No default subscriptions found.")
-            return
-        asyncio.run(self.manage_subscriptions_async(DEFAULT_SUBSCRIPTIONS))
 
     def parse_data(self, data):
         url_pattern = r'(http[^\\s]+)'
