@@ -38,14 +38,23 @@ def setup_chromedriver():
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    return webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+    
+    try:
+        return webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+    except ValueError as e:
+        logging.error(f"Error setting up ChromeDriver: {e}")
+        raise
 
 def main():
     setup_logging()
     config_manager = ConfigManager()
 
     # Initialize chromedriver at the start
-    driver = setup_chromedriver()
+    try:
+        driver = setup_chromedriver()
+    except Exception as e:
+        logging.error(f"Failed to initialize ChromeDriver: {e}")
+        return
 
     root = Tk()
     app = IPTVApp(root, config_manager, driver)
