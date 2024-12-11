@@ -37,10 +37,14 @@ class ServerConnection:
         raise ConnectionError(f"Failed to connect to {self.server_url} after {retries} attempts")
 
     def fetch_server_content(self):
-        options = Options()
-        options.headless = True
-        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
-        driver.get(self.server_url)
-        content = driver.page_source
-        driver.quit()
-        return content
+        try:
+            options = Options()
+            options.headless = True
+            driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+            driver.get(self.server_url)
+            content = driver.page_source
+            driver.quit()
+            return content
+        except Exception as e:
+            logging.error(f"WebDriver error: {e}")
+            return None
