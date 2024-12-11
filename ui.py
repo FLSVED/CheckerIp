@@ -22,9 +22,10 @@ class IPTVContentParser(HTMLParser):
         self.content.append(data)
 
 class IPTVApp:
-    def __init__(self, root, config_manager):
+    def __init__(self, root, config_manager, driver):
         self.root = root
         self.config_manager = config_manager
+        self.driver = driver
         self.subscription_manager = SubscriptionManager()
         self.load_stored_subscription()
         self.create_main_widgets()
@@ -121,7 +122,7 @@ class IPTVApp:
         connection = ServerConnection(url, self.config_manager.get('mac_address'))
 
         def show_content():
-            content = connection.fetch_server_content()
+            content = connection.fetch_server_content(self.driver)
             if content:
                 parser = IPTVContentParser()
                 parser.feed(content)
